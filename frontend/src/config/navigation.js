@@ -1,6 +1,6 @@
 export const mainNavigation = [
-  { label: 'Foundation', href: '/' },
+  { label: 'Platform', href: '#platform' },
+  { label: 'AI Chat', href: '#ai-chat' },
   { label: 'Analytics', href: '#analytics' },
-  { label: 'Accessibility', href: '#accessibility' },
-  { label: 'AI Ready', href: '#ai-ready' },
+  { label: 'Operations', href: '#operations' },
 ]

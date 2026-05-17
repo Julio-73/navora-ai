@@ -4,24 +4,24 @@
 
 @layer base {
   :root {
-    --background: 224 31% 6%;
+    --background: 226 35% 5%;
     --foreground: 210 40% 98%;
-    --card: 224 28% 8%;
+    --card: 225 29% 8%;
     --card-foreground: 210 40% 98%;
     --popover: 224 28% 8%;
     --popover-foreground: 210 40% 98%;
     --primary: 168 76% 48%;
     --primary-foreground: 222 47% 7%;
-    --secondary: 223 18% 15%;
+    --secondary: 222 19% 14%;
     --secondary-foreground: 210 40% 98%;
-    --muted: 222 18% 13%;
+    --muted: 222 18% 12%;
     --muted-foreground: 218 14% 68%;
     --accent: 262 83% 68%;
     --accent-foreground: 210 40% 98%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
-    --border: 220 16% 19%;
-    --input: 220 16% 19%;
+    --border: 220 16% 18%;
+    --input: 220 16% 18%;
     --ring: 168 76% 48%;
     --radius: 0.5rem;
   }
@@ -32,6 +32,8 @@
 
   html {
     color-scheme: dark;
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
   }
 
   body {
@@ -42,16 +44,32 @@
     letter-spacing: 0;
   }
 
+  ::selection {
+    background: hsl(var(--primary) / 0.28);
+  }
+
   #root {
     @apply min-h-screen;
+  }
+
+  [id] {
+    scroll-margin-top: 5rem;
   }
 }
 
 @layer utilities {
   .premium-grid {
     background-image:
-      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+      linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
     background-size: 48px 48px;
+  }
+
+  .glass-panel {
+    @apply border border-white/10 bg-white/[0.045] shadow-soft backdrop-blur-2xl;
+  }
+
+  .text-balance {
+    text-wrap: balance;
   }
 }
