@@ -72,33 +72,34 @@ function HeroSection({ liveStage, tick }) {
         >
           <Badge className="text-primary">
             <span className="mr-2 h-2 w-2 rounded-full bg-primary live-pulse" />
-            Live demo mode active
+            Modo demo en vivo activo
           </Badge>
           <h1 className="text-balance mt-6 max-w-4xl text-5xl font-semibold leading-[0.98] text-foreground sm:text-6xl lg:text-7xl">
-            Accessibility intelligence for Peru tourism operations.
+            Inteligencia de accesibilidad para operaciones turisticas del Peru.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-            Rimay AI simulates how a tourist report becomes an AI incident,
-            a map hotspot, a dashboard signal and an operational response.
+            Rimay AI simula como un reporte turistico se convierte en un
+            incidente de IA, un punto critico en el mapa, una senal analitica y
+            una respuesta operacional.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild>
               <a href="#ai-chat">
-                Watch demo flow
+                Ver flujo demo
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </Button>
             <Button asChild variant="outline">
-              <a href="#analytics">Open analytics</a>
+              <a href="#analytics">Abrir analitica</a>
             </Button>
           </div>
 
           <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
             {[
-              ['Tourism zones', '5 monitored'],
-              ['AI reports', `${42 + tick} today`],
-              ['Live status', 'Simulated'],
+              ['Zonas turisticas', '5 monitoreadas'],
+              ['Reportes IA', `${42 + tick} hoy`],
+              ['Estado en vivo', 'Simulado'],
             ].map(([label, value]) => (
               <motion.div
                 key={label}
@@ -121,14 +122,14 @@ function HeroSection({ liveStage, tick }) {
           <div className="rounded-md border border-white/10 bg-[#090d16] p-4">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-medium">Peru accessibility map</p>
+                <p className="text-sm font-medium">Mapa de accesibilidad del Peru</p>
                 <p className="text-xs text-muted-foreground">
-                  Miraflores, Barranco, Cusco and Machu Picchu
+                  Miraflores, Barranco, Cusco y Machu Picchu
                 </p>
               </div>
               <Badge className="border-primary/20 bg-primary/10 text-primary">
                 <Radio className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-                Live pulse
+                Pulso en vivo
               </Badge>
             </div>
 
@@ -159,9 +160,9 @@ function ChatSection({ liveStage }) {
     <section id="ai-chat" className="relative border-t border-white/10 py-24">
       <div className="container">
         <SectionIntro
-          eyebrow="AI accessibility assistant"
-          title="A convincing WhatsApp-style command center."
-          description="Text, voice and image previews simulate the future multimodal workflow without connecting a real AI model yet."
+          eyebrow="Asistente IA de accesibilidad"
+          title="Un centro de comando estilo WhatsApp, listo para demo."
+          description="Texto, voz e imagen simulan el flujo multimodal futuro sin conectar todavia un modelo de IA real."
         />
 
         <div className="mt-12 grid gap-6 lg:grid-cols-[0.35fr_0.65fr]">
@@ -178,9 +179,9 @@ function AnalyticsSection({ kpis }) {
     <section id="analytics" className="relative border-t border-white/10 py-24">
       <div className="container">
         <SectionIntro
-          eyebrow="Operational analytics"
-          title="KPIs that feel alive during the pitch."
-          description="The dashboard simulates live movement from reports, incidents and assisted routes across Peru tourism areas."
+          eyebrow="Analitica operacional"
+          title="KPIs que se sienten vivos durante la presentacion."
+          description="El panel simula movimiento en vivo desde reportes, incidentes y rutas asistidas en zonas turisticas del Peru."
         />
 
         <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -190,7 +191,7 @@ function AnalyticsSection({ kpis }) {
         </div>
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[0.62fr_0.38fr]">
-          <ChartPanel title="Accessibility reports" subtitle="Simulated weekly signal by district">
+          <ChartPanel title="Reportes de accesibilidad" subtitle="Senal semanal simulada por distrito">
             <ResponsiveContainer width="100%" height={280}>
               <AreaChart data={accessibilityTrend}>
                 <defs>
@@ -211,7 +212,7 @@ function AnalyticsSection({ kpis }) {
             </ResponsiveContainer>
           </ChartPanel>
 
-          <ChartPanel title="Route readiness" subtitle="Accessibility score by zone">
+          <ChartPanel title="Preparacion de rutas" subtitle="Puntaje de accesibilidad por zona">
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={routeQuality}>
                 <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
@@ -231,16 +232,16 @@ function OperationsSection({ feed, liveStage }) {
     <section id="operations" className="relative border-t border-white/10 py-24">
       <div className="container grid gap-6 lg:grid-cols-[0.42fr_0.58fr]">
         <SectionIntro
-          eyebrow="Storytelling layer"
-          title="From citizen report to operational decision."
-          description="The demo links a tourist complaint, AI classification, map hotspot, dashboard change and municipal escalation in one visual narrative."
+          eyebrow="Narrativa operacional"
+          title="Del reporte ciudadano a la decision operacional."
+          description="La demo conecta una alerta turistica, clasificacion de IA, punto critico en mapa, cambio en panel y escalamiento municipal en una sola narrativa visual."
         />
 
         <div className="grid gap-6 md:grid-cols-2">
           <div className="glass-panel rounded-lg p-5">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Incident heatmap</h3>
-              <Badge className="text-primary">Updating</Badge>
+              <h3 className="font-semibold">Mapa de calor de incidentes</h3>
+              <Badge className="text-primary">Actualizando</Badge>
             </div>
             <div className="mt-5 grid grid-cols-6 gap-2">
               {Array.from({ length: 36 }).map((_, index) => (
@@ -265,17 +266,17 @@ function OperationsSection({ feed, liveStage }) {
             </div>
 
             <div className="mt-5 rounded-md border border-white/10 bg-white/[0.035] p-4">
-              <p className="text-sm font-medium">Current story</p>
+              <p className="text-sm font-medium">Historia actual</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Barranco tourist report creates a medium severity incident,
-                highlights the map and raises analytics demand.
+                Un reporte turistico en Barranco crea un incidente de severidad
+                media, resalta el mapa y eleva la demanda analitica.
               </p>
             </div>
           </div>
 
           <div className="glass-panel rounded-lg p-5">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Live activity feed</h3>
+              <h3 className="font-semibold">Actividad en tiempo real</h3>
               <span className="h-2 w-2 rounded-full bg-primary live-pulse" />
             </div>
             <div className="mt-5 space-y-4">
@@ -345,9 +346,9 @@ function LeafletDemoMap({ liveStage }) {
     <div className="relative min-h-[360px] overflow-hidden rounded-lg border border-white/10 bg-[#071018]">
       <div ref={mapNodeRef} className="h-[360px] w-full" />
       <div className="pointer-events-none absolute left-4 top-4 rounded-md border border-white/10 bg-background/75 px-3 py-2 backdrop-blur-xl">
-        <p className="text-xs font-medium">Live tourism zones</p>
+        <p className="text-xs font-medium">Zonas turisticas en vivo</p>
         <p className="text-[11px] text-muted-foreground">
-          Simulated Leaflet layer
+          Capa Leaflet simulada
         </p>
       </div>
     </div>
@@ -391,17 +392,17 @@ function SectionIntro({ eyebrow, title, description }) {
 
 function ConversationSidebar({ liveStage }) {
   const conversations = [
-    ['Barranco incident', 'Medium severity escalation'],
-    ['Miraflores image scan', 'Photo analysis preview'],
-    ['Cusco voice note', 'Transcript generated'],
-    ['Machu Picchu demand', 'Visitor flow spike'],
+    ['Incidente en Barranco', 'Escalamiento de severidad media'],
+    ['Analisis visual Miraflores', 'Vista previa de imagen'],
+    ['Nota de voz Cusco', 'Transcripcion generada'],
+    ['Demanda Machu Picchu', 'Pico de flujo turistico'],
   ]
 
   return (
     <div className="glass-panel rounded-lg p-4">
       <div className="flex items-center justify-between">
-        <h3 className="font-semibold">Conversations</h3>
-        <Badge>4 active</Badge>
+        <h3 className="font-semibold">Conversaciones</h3>
+        <Badge>4 activas</Badge>
       </div>
       <div className="mt-4 space-y-3">
         {conversations.map(([title, text], index) => (
@@ -433,13 +434,13 @@ function ChatPanel({ liveStage }) {
             <Bot className="h-5 w-5" aria-hidden="true" />
           </span>
           <div>
-            <h3 className="font-semibold">Rimay Assistant</h3>
-            <p className="text-xs text-primary">accessibility triage online</p>
+            <h3 className="font-semibold">Asistente Rimay</h3>
+            <p className="text-xs text-primary">triaje de accesibilidad online</p>
           </div>
         </div>
         <Button variant="outline" size="sm">
           <Mic className="h-4 w-4" aria-hidden="true" />
-          Voice
+          Voz
         </Button>
       </div>
 
@@ -468,7 +469,7 @@ function ChatPanel({ liveStage }) {
             <Paperclip className="h-5 w-5" aria-hidden="true" />
           </Button>
           <div className="flex-1 text-sm text-muted-foreground">
-            Report a tourism accessibility issue...
+            Reporta un problema de accesibilidad turistica...
           </div>
           <Button size="icon">
             <Send className="h-4 w-4" aria-hidden="true" />
@@ -542,9 +543,9 @@ function UploadPreview() {
             <Camera className="h-5 w-5" aria-hidden="true" />
           </span>
           <div>
-            <p className="text-sm font-medium">barranco-entrance.jpg</p>
+            <p className="text-sm font-medium">ingreso-barranco.jpg</p>
             <p className="text-xs text-muted-foreground">
-              Simulated result: curb too high, alternate route suggested.
+              Resultado simulado: sardinel alto, ruta alterna sugerida.
             </p>
           </div>
         </div>
@@ -555,11 +556,11 @@ function UploadPreview() {
 
 function TypingIndicator({ liveStage }) {
   const labels = [
-    'Classifying severity',
-    'Generating municipal escalation',
-    'Updating dashboard signal',
-    'Preparing accessible route',
-    'Syncing map hotspot',
+    'Clasificando severidad',
+    'Generando escalamiento municipal',
+    'Actualizando senal del panel',
+    'Preparando ruta accesible',
+    'Sincronizando punto critico del mapa',
   ]
 
   return (

@@ -56,14 +56,14 @@ export function AppShell() {
           <div className="flex items-center gap-2">
             <Button variant="outline" size="sm" className="hidden sm:flex">
               <Sparkles className="h-4 w-4" aria-hidden="true" />
-              Demo Ready
+              Demo lista
             </Button>
             <Button
               variant="ghost"
               size="icon"
               className="md:hidden"
               aria-expanded={isMobileMenuOpen}
-              aria-label="Toggle navigation menu"
+              aria-label="Abrir o cerrar menu de navegacion"
               onClick={() => setIsMobileMenuOpen((current) => !current)}
             >
               {isMobileMenuOpen ? (

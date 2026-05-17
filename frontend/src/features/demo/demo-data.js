@@ -12,42 +12,42 @@ import {
 
 export const tourismZones = [
   {
-    name: 'Miraflores Accessible Coast',
+    name: 'Costa Accesible de Miraflores',
     city: 'Lima',
     score: 94,
-    status: 'Validated',
+    status: 'Validada',
     coordinates: [-12.1211, -77.0305],
     type: 'hotspot',
   },
   {
-    name: 'Barranco Bridge Corridor',
+    name: 'Corredor Barranco Puente',
     city: 'Lima',
     score: 72,
-    status: 'Incident detected',
+    status: 'Incidente detectado',
     coordinates: [-12.149, -77.0219],
     type: 'incident',
   },
   {
-    name: 'Centro Historico Route',
+    name: 'Ruta Centro Historico',
     city: 'Lima',
     score: 88,
-    status: 'AI recommended',
+    status: 'Recomendada por IA',
     coordinates: [-12.0464, -77.0428],
     type: 'hotspot',
   },
   {
-    name: 'Cusco Plaza Access',
+    name: 'Acceso Plaza de Cusco',
     city: 'Cusco',
     score: 81,
-    status: 'Needs review',
+    status: 'Requiere revision',
     coordinates: [-13.5169, -71.9789],
     type: 'review',
   },
   {
-    name: 'Machu Picchu Entry Flow',
+    name: 'Flujo de Ingreso Machu Picchu',
     city: 'Cusco',
     score: 76,
-    status: 'High demand',
+    status: 'Alta demanda',
     coordinates: [-13.1631, -72.545],
     type: 'hotspot',
   },
@@ -55,28 +55,28 @@ export const tourismZones = [
 
 export const baseKpis = [
   {
-    label: 'Accessible routes',
+    label: 'Rutas accesibles',
     value: 2418,
     suffix: '',
     delta: '+18%',
     icon: Map,
   },
   {
-    label: 'Visitors assisted',
+    label: 'Visitantes asistidos',
     value: 8930,
     suffix: '',
     delta: '+31%',
     icon: Users,
   },
   {
-    label: 'Avg response',
+    label: 'Respuesta promedio',
     value: 1.2,
     suffix: 's',
     delta: '-24%',
     icon: Clock3,
   },
   {
-    label: 'Resolved alerts',
+    label: 'Alertas resueltas',
     value: 96,
     suffix: '%',
     delta: '+12%',
@@ -85,13 +85,13 @@ export const baseKpis = [
 ]
 
 export const accessibilityTrend = [
-  { label: 'Mon', Miraflores: 34, Barranco: 22, Cusco: 18 },
-  { label: 'Tue', Miraflores: 48, Barranco: 31, Cusco: 24 },
-  { label: 'Wed', Miraflores: 44, Barranco: 38, Cusco: 29 },
-  { label: 'Thu', Miraflores: 61, Barranco: 42, Cusco: 36 },
-  { label: 'Fri', Miraflores: 76, Barranco: 54, Cusco: 44 },
-  { label: 'Sat', Miraflores: 91, Barranco: 63, Cusco: 58 },
-  { label: 'Sun', Miraflores: 86, Barranco: 59, Cusco: 62 },
+  { label: 'Lun', Miraflores: 34, Barranco: 22, Cusco: 18 },
+  { label: 'Mar', Miraflores: 48, Barranco: 31, Cusco: 24 },
+  { label: 'Mie', Miraflores: 44, Barranco: 38, Cusco: 29 },
+  { label: 'Jue', Miraflores: 61, Barranco: 42, Cusco: 36 },
+  { label: 'Vie', Miraflores: 76, Barranco: 54, Cusco: 44 },
+  { label: 'Sab', Miraflores: 91, Barranco: 63, Cusco: 58 },
+  { label: 'Dom', Miraflores: 86, Barranco: 59, Cusco: 62 },
 ]
 
 export const routeQuality = [
@@ -104,73 +104,73 @@ export const routeQuality = [
 export const incidentQueue = [
   {
     icon: AlertTriangle,
-    title: 'Barranco ramp obstruction',
-    text: 'Citizen report: temporary sidewalk blockage near Puente de los Suspiros.',
+    title: 'Obstruccion de rampa en Barranco',
+    text: 'Reporte ciudadano: bloqueo temporal de vereda cerca del Puente de los Suspiros.',
     zone: 'Barranco',
-    severity: 'Medium',
+    severity: 'Media',
   },
   {
     icon: Camera,
-    title: 'Image analysis completed',
-    text: 'AI preview found missing tactile signage near Miraflores boardwalk access.',
+    title: 'Analisis de imagen completado',
+    text: 'La vista previa de IA detecto senalizacion tactil faltante cerca del malecon de Miraflores.',
     zone: 'Miraflores',
-    severity: 'Low',
+    severity: 'Baja',
   },
   {
     icon: CheckCircle2,
-    title: 'Route validated',
-    text: 'Centro Historico accessible path approved with elevator and ramp coverage.',
+    title: 'Ruta validada',
+    text: 'Ruta accesible del Centro Historico aprobada con cobertura de ascensor y rampas.',
     zone: 'Centro Historico',
-    severity: 'Resolved',
+    severity: 'Resuelto',
   },
   {
     icon: Upload,
-    title: 'Tourist report received',
-    text: 'Audio note from Cusco Plaza converted into an accessibility review draft.',
+    title: 'Reporte turistico recibido',
+    text: 'Nota de audio desde la Plaza de Cusco convertida en borrador de revision de accesibilidad.',
     zone: 'Cusco',
-    severity: 'Review',
+    severity: 'Revision',
   },
   {
     icon: Activity,
-    title: 'Live demand spike',
-    text: 'Machu Picchu entry flow is showing elevated assistance requests.',
+    title: 'Pico de demanda en vivo',
+    text: 'El flujo de ingreso a Machu Picchu muestra un aumento de solicitudes de asistencia.',
     zone: 'Machu Picchu',
-    severity: 'High',
+    severity: 'Alta',
   },
 ]
 
 export const chatMessages = [
   {
     from: 'ai',
-    text: 'Welcome to Rimay AI. I can triage accessibility reports from text, photos and voice notes across Peru tourism zones.',
+    text: 'Bienvenido a Rimay AI. Puedo priorizar reportes de accesibilidad desde texto, fotos y notas de voz en zonas turisticas del Peru.',
     time: '09:41',
   },
   {
     from: 'user',
-    text: 'There is no wheelchair access in this tourist area.',
+    text: 'No hay acceso para silla de ruedas en esta zona turistica.',
     time: '09:42',
   },
   {
     from: 'ai',
-    text: 'Accessibility incident detected in Barranco district. Severity: Medium. Suggested municipal escalation generated.',
+    text: 'Incidente de accesibilidad detectado en Barranco. Severidad: Media. Se genero una sugerencia de escalamiento municipal.',
     time: '09:42',
-    meta: 'Linked to dashboard incident queue',
+    meta: 'Vinculado a la cola de incidentes del panel',
   },
   {
     from: 'user',
-    text: 'I uploaded a photo of the entrance near Puente de los Suspiros.',
+    text: 'Subi una foto del ingreso cerca del Puente de los Suspiros.',
     time: '09:43',
   },
   {
     from: 'ai',
-    text: 'Image analysis preview: steep curb, no visible ramp, narrow pedestrian flow. Recommended action: temporary assisted route via Bajada de Banos.',
+    text: 'Vista previa de analisis de imagen: sardinel alto, rampa no visible y flujo peatonal estrecho. Accion recomendada: ruta asistida temporal por Bajada de Banos.',
     time: '09:43',
-    meta: 'Simulated multimodal result',
+    meta: 'Resultado multimodal simulado',
   },
 ]
 
 export const suggestedPrompts = [
-  'Report wheelchair access issue in Barranco',
-  'Find low-slope route in Centro Historico',
-  'Analyze uploaded entrance photo',
+  'Reportar problema de acceso en Barranco',
+  'Buscar ruta de baja pendiente en Centro Historico',
+  'Analizar foto de ingreso subida',
 ]
