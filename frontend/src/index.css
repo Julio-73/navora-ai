@@ -72,4 +72,86 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .live-pulse {
+    animation: live-pulse 1.8s ease-in-out infinite;
+  }
+
+  .demo-marker {
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 999px;
+    color: white;
+    display: flex;
+    font-size: 12px;
+    font-weight: 700;
+    height: 44px;
+    justify-content: center;
+    position: relative;
+    width: 44px;
+  }
+
+  .demo-marker::before {
+    border-radius: inherit;
+    content: "";
+    inset: -8px;
+    opacity: 0.42;
+    position: absolute;
+  }
+
+  .demo-marker.safe {
+    background: rgba(45, 212, 191, 0.92);
+    box-shadow: 0 0 32px rgba(45, 212, 191, 0.42);
+  }
+
+  .demo-marker.incident {
+    background: rgba(244, 63, 94, 0.92);
+    box-shadow: 0 0 32px rgba(244, 63, 94, 0.42);
+  }
+
+  .demo-marker.review {
+    background: rgba(167, 139, 250, 0.92);
+    box-shadow: 0 0 32px rgba(167, 139, 250, 0.42);
+  }
+
+  .demo-marker.active::before {
+    animation: marker-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+    background: currentColor;
+  }
+
+  .leaflet-container {
+    background: #071018;
+    filter: saturate(0.78) brightness(0.78) contrast(1.08);
+  }
+
+  .leaflet-tooltip {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(7, 10, 20, 0.92);
+    border-radius: 8px;
+    color: white;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 8px 10px;
+  }
+}
+
+@keyframes live-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.42);
+    opacity: 1;
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(45, 212, 191, 0);
+    opacity: 0.72;
+  }
+}
+
+@keyframes marker-ping {
+  75%,
+  100% {
+    opacity: 0;
+    transform: scale(1.9);
+  }
 }
