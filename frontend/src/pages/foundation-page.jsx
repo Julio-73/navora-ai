@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -17,21 +17,29 @@ import {
   AudioLines,
   Bot,
   Camera,
+  Cloud,
   Map,
   Mic,
   Paperclip,
+  Play,
   Radio,
   Send,
+  Sparkles,
+  WifiOff,
 } from 'lucide-react'
 
 import {
   accessibilityTrend,
   chatMessages,
+  culturalExperiences,
+  explorationProfiles,
+  heritageTimeline,
   routeQuality,
   suggestedPrompts,
   tourismZones,
 } from '@/features/demo/demo-data'
 import { useDemoRealtime } from '@/features/demo/use-demo-realtime'
+import { sendChatMessage } from '@/services/api/chat-api'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { cn } from '@/lib/utils'
@@ -41,20 +49,58 @@ const fadeUp = {
   visible: { opacity: 1, y: 0 },
 }
 
+const destinationAliases = [
+  { key: 'Barranco', aliases: ['barranco', 'puente de los suspiros', 'suspiros'] },
+  { key: 'Miraflores', aliases: ['miraflores', 'malecon', 'malecón'] },
+  { key: 'Cusco', aliases: ['cusco', 'plaza de cusco'] },
+  { key: 'Machu Picchu', aliases: ['machu picchu', 'machupicchu'] },
+  { key: 'Centro Historico', aliases: ['centro historico', 'centro histórico'] },
+]
+
 export function FoundationPage() {
   const demo = useDemoRealtime()
+  const [activeDestination, setActiveDestination] = useState('Barranco')
+  const [liveReport, setLiveReport] = useState(null)
+
+  function handleDemoSignal(message, source = 'chat') {
+    const destination = detectDestination(message)
+
+    if (!destination) {
+      return
+    }
+
+    setActiveDestination(destination)
+    setLiveReport({
+      destination,
+      id: `${Date.now()}-${destination}`,
+      message,
+      source,
+    })
+  }
 
   return (
     <div className="bg-background">
-      <HeroSection liveStage={demo.liveStage} tick={demo.tick} />
-      <ChatSection liveStage={demo.liveStage} />
-      <AnalyticsSection kpis={demo.kpis} />
-      <OperationsSection feed={demo.feed} liveStage={demo.liveStage} />
+      <HeroSection
+        activeDestination={activeDestination}
+        liveStage={demo.liveStage}
+        tick={demo.tick}
+      />
+      <ChatSection
+        activeDestination={activeDestination}
+        liveStage={demo.liveStage}
+        onDemoSignal={handleDemoSignal}
+      />
+      <AnalyticsSection kpis={demo.kpis} liveReport={liveReport} />
+      <OperationsSection
+        feed={demo.feed}
+        liveReport={liveReport}
+        liveStage={demo.liveStage}
+      />
     </div>
   )
 }
 
-function HeroSection({ liveStage, tick }) {
+function HeroSection({ activeDestination, liveStage, tick }) {
   return (
     <section
       id="platform"
@@ -72,34 +118,34 @@ function HeroSection({ liveStage, tick }) {
         >
           <Badge className="text-primary">
             <span className="mr-2 h-2 w-2 rounded-full bg-primary live-pulse" />
-            Modo demo en vivo activo
+            Explora el Peru con mas confianza
           </Badge>
           <h1 className="text-balance mt-6 max-w-4xl text-5xl font-semibold leading-[0.98] text-foreground sm:text-6xl lg:text-7xl">
-            Inteligencia de accesibilidad para operaciones turisticas del Peru.
+            Tu companero inteligente para explorar el Peru sin barreras
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-            Rimay AI simula como un reporte turistico se convierte en un
-            incidente de IA, un punto critico en el mapa, una senal analitica y
-            una respuesta operacional.
+            Rimay AI ayuda a personas con discapacidad, familias y viajeros a
+            descubrir rutas accesibles, reportar barreras por voz o imagen y
+            moverse por destinos del Peru con informacion clara, cercana y util.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild>
               <a href="#ai-chat">
-                Ver flujo demo
+                Probar asistente IA
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </Button>
             <Button asChild variant="outline">
-              <a href="#analytics">Abrir analitica</a>
+              <a href="#platform">Explorar rutas accesibles</a>
             </Button>
           </div>
 
           <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
             {[
-              ['Zonas turisticas', '5 monitoreadas'],
-              ['Reportes IA', `${42 + tick} hoy`],
-              ['Estado en vivo', 'Simulado'],
+              ['Destinos inclusivos', '5 en exploracion'],
+              ['Ayudas generadas', `${42 + tick} hoy`],
+              ['Acompanamiento', 'Siempre activo'],
             ].map(([label, value]) => (
               <motion.div
                 key={label}
@@ -122,19 +168,22 @@ function HeroSection({ liveStage, tick }) {
           <div className="rounded-md border border-white/10 bg-[#090d16] p-4">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-medium">Mapa de accesibilidad del Peru</p>
+                <p className="text-sm font-medium">Rutas accesibles del Peru</p>
                 <p className="text-xs text-muted-foreground">
-                  Miraflores, Barranco, Cusco y Machu Picchu
+                  Lugares para explorar con mayor seguridad y autonomia
                 </p>
               </div>
               <Badge className="border-primary/20 bg-primary/10 text-primary">
                 <Radio className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-                Pulso en vivo
+                Guia activa
               </Badge>
             </div>
 
             <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_0.76fr]">
-              <LeafletDemoMap liveStage={liveStage} />
+              <LeafletDemoMap
+                activeDestination={activeDestination}
+                liveStage={liveStage}
+              />
 
               <div className="grid gap-3">
                 {tourismZones.slice(0, 3).map((zone, index) => (
@@ -142,10 +191,11 @@ function HeroSection({ liveStage, tick }) {
                     key={zone.name}
                     title={zone.name}
                     value={`${zone.score}% ${zone.status}`}
-                    icon={index === liveStage % 3 ? Activity : Map}
-                    active={index === liveStage % 3}
+                    icon={zoneMatchesDestination(zone, activeDestination) ? Activity : Map}
+                    active={zoneMatchesDestination(zone, activeDestination) || index === liveStage % 3}
                   />
                 ))}
+                <OfflineReadiness />
               </div>
             </div>
           </div>
@@ -155,43 +205,62 @@ function HeroSection({ liveStage, tick }) {
   )
 }
 
-function ChatSection({ liveStage }) {
+function ChatSection({ activeDestination, liveStage, onDemoSignal }) {
+  const [selectedProfile, setSelectedProfile] = useState(explorationProfiles[0])
+
   return (
     <section id="ai-chat" className="relative border-t border-white/10 py-24">
       <div className="container">
         <SectionIntro
           eyebrow="Asistente IA de accesibilidad"
-          title="Un centro de comando estilo WhatsApp, listo para demo."
-          description="Texto, voz e imagen simulan el flujo multimodal futuro sin conectar todavia un modelo de IA real."
+          title="Pregunta como hablas. Rimay te acompana como una guia cercana."
+          description="Usa texto, voz o imagen para contar una barrera, pedir una ruta accesible o entender que opcion es mas comoda para tu viaje."
+        />
+
+        <CulturalMode
+          selectedProfile={selectedProfile}
+          setSelectedProfile={setSelectedProfile}
         />
 
         <div className="mt-12 grid gap-6 lg:grid-cols-[0.35fr_0.65fr]">
-          <ConversationSidebar liveStage={liveStage} />
-          <ChatPanel liveStage={liveStage} />
+          <ConversationSidebar
+            activeDestination={activeDestination}
+            liveStage={liveStage}
+          />
+          <ChatPanel liveStage={liveStage} onDemoSignal={onDemoSignal} />
         </div>
       </div>
     </section>
   )
 }
 
-function AnalyticsSection({ kpis }) {
+function AnalyticsSection({ kpis, liveReport }) {
   return (
     <section id="analytics" className="relative border-t border-white/10 py-24">
       <div className="container">
         <SectionIntro
-          eyebrow="Analitica operacional"
-          title="KPIs que se sienten vivos durante la presentacion."
-          description="El panel simula movimiento en vivo desde reportes, incidentes y rutas asistidas en zonas turisticas del Peru."
+          eyebrow="Accesibilidad en datos"
+          title="Informacion clara para mejorar la experiencia de cada visitante."
+          description="El panel muestra como los reportes de personas reales ayudan a priorizar rutas, detectar barreras y hacer mas inclusivos los destinos turisticos."
         />
 
         <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {kpis.map((kpi) => (
-            <KpiCard key={kpi.label} {...kpi} />
+          {kpis.map((kpi, index) => (
+            <KpiCard key={kpi.label} pulse={Boolean(liveReport) && index === 0} {...kpi} />
           ))}
         </div>
+        {liveReport ? (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-4 rounded-lg border border-primary/20 bg-primary/10 px-4 py-3 text-sm text-primary"
+          >
+            Nuevo reporte conectado: ruta accesible sugerida en {liveReport.destination}.
+          </motion.div>
+        ) : null}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[0.62fr_0.38fr]">
-          <ChartPanel title="Reportes de accesibilidad" subtitle="Senal semanal simulada por distrito">
+          <ChartPanel title="Necesidades de accesibilidad" subtitle="Senal semanal simulada por distrito">
             <ResponsiveContainer width="100%" height={280}>
               <AreaChart data={accessibilityTrend}>
                 <defs>
@@ -212,7 +281,7 @@ function AnalyticsSection({ kpis }) {
             </ResponsiveContainer>
           </ChartPanel>
 
-          <ChartPanel title="Preparacion de rutas" subtitle="Puntaje de accesibilidad por zona">
+          <ChartPanel title="Rutas preparadas" subtitle="Nivel de accesibilidad por zona">
             <ResponsiveContainer width="100%" height={280}>
               <BarChart data={routeQuality}>
                 <XAxis dataKey="label" axisLine={false} tickLine={false} tick={{ fill: '#94a3b8', fontSize: 12 }} />
@@ -227,21 +296,35 @@ function AnalyticsSection({ kpis }) {
   )
 }
 
-function OperationsSection({ feed, liveStage }) {
+function OperationsSection({ feed, liveReport, liveStage }) {
+  const enrichedFeed = liveReport
+    ? [
+        {
+          icon: Mic,
+          severity: 'Nuevo',
+          text: `Reporte por ${liveReport.source === 'voz' ? 'voz' : 'chat'} conectado con el mapa y la guia de ${liveReport.destination}.`,
+          title: `Nueva solicitud en ${liveReport.destination}`,
+          zone: liveReport.destination,
+        },
+        ...feed,
+      ].slice(0, 4)
+    : feed
+
   return (
     <section id="operations" className="relative border-t border-white/10 py-24">
       <div className="container grid gap-6 lg:grid-cols-[0.42fr_0.58fr]">
         <SectionIntro
-          eyebrow="Narrativa operacional"
-          title="Del reporte ciudadano a la decision operacional."
-          description="La demo conecta una alerta turistica, clasificacion de IA, punto critico en mapa, cambio en panel y escalamiento municipal en una sola narrativa visual."
+          eyebrow="Historias que ayudan"
+          title="Una voz puede mejorar el camino de muchas personas."
+          description="La demo muestra como un reporte simple se convierte en orientacion util, una ruta alterna y una senal visible para mejorar la experiencia inclusiva."
         />
 
         <div className="grid gap-6 md:grid-cols-2">
+          <HeritageTimeline liveReport={liveReport} liveStage={liveStage} />
           <div className="glass-panel rounded-lg p-5">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Mapa de calor de incidentes</h3>
-              <Badge className="text-primary">Actualizando</Badge>
+              <h3 className="font-semibold">Zonas que necesitan atencion</h3>
+              <Badge className="text-primary">Aprendiendo</Badge>
             </div>
             <div className="mt-5 grid grid-cols-6 gap-2">
               {Array.from({ length: 36 }).map((_, index) => (
@@ -266,21 +349,22 @@ function OperationsSection({ feed, liveStage }) {
             </div>
 
             <div className="mt-5 rounded-md border border-white/10 bg-white/[0.035] p-4">
-              <p className="text-sm font-medium">Historia actual</p>
+              <p className="text-sm font-medium">Historia de ayuda</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Un reporte turistico en Barranco crea un incidente de severidad
-                media, resalta el mapa y eleva la demanda analitica.
+                Una persona reporta una barrera en Barranco. Rimay sugiere una
+                ruta alterna, marca la zona y ayuda a que otros visitantes viajen
+                con mas tranquilidad.
               </p>
             </div>
           </div>
 
           <div className="glass-panel rounded-lg p-5">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Actividad en tiempo real</h3>
+              <h3 className="font-semibold">Historias en tiempo real</h3>
               <span className="h-2 w-2 rounded-full bg-primary live-pulse" />
             </div>
             <div className="mt-5 space-y-4">
-              {feed.map((item) => (
+              {enrichedFeed.map((item) => (
                 <ActivityItem key={`${item.title}-${item.zone}`} item={item} />
               ))}
             </div>
@@ -291,7 +375,7 @@ function OperationsSection({ feed, liveStage }) {
   )
 }
 
-function LeafletDemoMap({ liveStage }) {
+function LeafletDemoMap({ activeDestination, liveStage }) {
   const mapNodeRef = useRef(null)
   const mapRef = useRef(null)
   const markersRef = useRef([])
@@ -311,9 +395,9 @@ function LeafletDemoMap({ liveStage }) {
       maxZoom: 18,
     }).addTo(mapRef.current)
 
-    markersRef.current = tourismZones.map((zone, index) => {
+    markersRef.current = tourismZones.map((zone) => {
       const marker = L.marker(zone.coordinates, {
-        icon: createDemoIcon(zone, index === liveStage % tourismZones.length),
+        icon: createDemoIcon(zone, false),
       }).addTo(mapRef.current)
 
       marker.bindTooltip(
@@ -329,27 +413,209 @@ function LeafletDemoMap({ liveStage }) {
       mapRef.current = null
       markersRef.current = []
     }
-  }, [liveStage])
+  }, [])
 
   useEffect(() => {
     markersRef.current.forEach((marker, index) => {
+      const zone = tourismZones[index]
+      const isActive =
+        zoneMatchesDestination(zone, activeDestination) ||
+        index === liveStage % tourismZones.length
+
       marker.setIcon(
         createDemoIcon(
-          tourismZones[index],
-          index === liveStage % tourismZones.length,
+          zone,
+          isActive,
         ),
       )
+
+      if (zoneMatchesDestination(zone, activeDestination)) {
+        mapRef.current?.flyTo(zone.coordinates, 13, {
+          duration: 1.1,
+          easeLinearity: 0.2,
+        })
+        marker.openTooltip()
+      }
     })
-  }, [liveStage])
+  }, [activeDestination, liveStage])
 
   return (
-    <div className="relative min-h-[360px] overflow-hidden rounded-lg border border-white/10 bg-[#071018]">
+    <div
+      aria-label="Mapa interactivo con rutas accesibles y lugares inclusivos del Peru"
+      className="relative min-h-[360px] overflow-hidden rounded-lg border border-white/10 bg-[#071018]"
+      role="region"
+    >
       <div ref={mapNodeRef} className="h-[360px] w-full" />
       <div className="pointer-events-none absolute left-4 top-4 rounded-md border border-white/10 bg-background/75 px-3 py-2 backdrop-blur-xl">
-        <p className="text-xs font-medium">Zonas turisticas en vivo</p>
+        <p className="text-xs font-medium">Lugares inclusivos cercanos</p>
         <p className="text-[11px] text-muted-foreground">
-          Capa Leaflet simulada
+          Guia visual de accesibilidad
         </p>
+      </div>
+    </div>
+  )
+}
+
+function CulturalMode({ selectedProfile, setSelectedProfile }) {
+  return (
+    <div className="mt-12 grid gap-6 lg:grid-cols-[0.38fr_0.62fr]">
+      <motion.div
+        initial={{ opacity: 0, y: 18 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-80px' }}
+        className="glass-panel rounded-lg p-5"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <h3 className="font-semibold">Como deseas explorar el Peru?</h3>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Rimay adapta el tono visual de la guia segun la forma en que
+              cada persona necesita moverse, escuchar o sentir el lugar.
+            </p>
+          </div>
+          <Sparkles className="h-5 w-5 text-primary" aria-hidden="true" />
+        </div>
+
+        <div className="mt-5 grid gap-2">
+          {explorationProfiles.map((profile) => {
+            const Icon = profile.icon
+            const isSelected = profile.label === selectedProfile.label
+
+            return (
+              <button
+                aria-pressed={isSelected}
+                className={cn(
+                  'rounded-md border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  isSelected
+                    ? 'border-primary/40 bg-primary/10 text-foreground'
+                    : 'border-white/10 bg-white/[0.035] text-muted-foreground hover:bg-white/[0.07] hover:text-foreground',
+                )}
+                key={profile.label}
+                onClick={() => setSelectedProfile(profile)}
+                type="button"
+              >
+                <span className="flex items-center gap-3">
+                  <Icon className="h-4 w-4 text-primary" aria-hidden="true" />
+                  <span className="text-sm font-medium">{profile.label}</span>
+                </span>
+              </button>
+            )
+          })}
+        </div>
+
+        <div className="mt-5 rounded-md border border-primary/20 bg-primary/10 p-4">
+          <p className="text-xs font-medium text-primary">Recomendacion activa</p>
+          <p className="mt-2 text-sm leading-6 text-muted-foreground">
+            {selectedProfile.recommendation}
+          </p>
+        </div>
+      </motion.div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        {culturalExperiences.map((experience) => (
+          <CulturalPlaceCard key={experience.title} experience={experience} />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function CulturalPlaceCard({ experience }) {
+  return (
+    <motion.article
+      whileHover={{ y: -5 }}
+      transition={{ duration: 0.22 }}
+      className="glass-panel rounded-lg p-5"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <Badge>{experience.place}</Badge>
+          <h3 className="mt-4 text-lg font-semibold">{experience.title}</h3>
+        </div>
+        <span className="flex h-10 w-10 items-center justify-center rounded-md bg-primary/10 text-primary">
+          <Map className="h-5 w-5" aria-hidden="true" />
+        </span>
+      </div>
+      <p className="mt-4 text-sm leading-6 text-muted-foreground">
+        {experience.description}
+      </p>
+      <div className="mt-5 grid gap-3 text-sm">
+        <InfoLine label="Sensacion" value={experience.emotion} />
+        <InfoLine label="Accesibilidad" value={experience.accessibility} />
+        <InfoLine label="Ambiente" value={experience.ambience} />
+        <InfoLine label="Horario ideal" value={experience.idealTime} />
+      </div>
+    </motion.article>
+  )
+}
+
+function InfoLine({ label, value }) {
+  return (
+    <div className="rounded-md border border-white/10 bg-white/[0.035] p-3">
+      <p className="text-xs text-muted-foreground">{label}</p>
+      <p className="mt-1 leading-6">{value}</p>
+    </div>
+  )
+}
+
+function OfflineReadiness() {
+  return (
+    <div className="rounded-lg border border-white/10 bg-white/[0.045] p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-medium">Disponible sin conexion</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+            Guarda la ruta para zonas con poca senal.
+          </p>
+        </div>
+        <WifiOff className="h-5 w-5 text-primary" aria-hidden="true" />
+      </div>
+      <Button
+        aria-label="Guardar ruta accesible para usar sin conexion"
+        className="mt-4 w-full"
+        size="sm"
+        type="button"
+        variant="outline"
+      >
+        <Cloud className="h-4 w-4" aria-hidden="true" />
+        Guardar ruta offline
+      </Button>
+    </div>
+  )
+}
+
+function HeritageTimeline({ liveReport, liveStage }) {
+  return (
+    <div className="glass-panel rounded-lg p-5 md:col-span-2">
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <h3 className="font-semibold">Camino de una experiencia mas inclusiva</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Una historia conectada desde la voz de una persona hasta una ruta
+            mas amable para todos.
+          </p>
+        </div>
+        <Badge className="text-primary">
+          {liveReport ? `Nuevo: ${liveReport.destination}` : 'Flujo vivo'}
+        </Badge>
+      </div>
+      <div className="mt-6 grid gap-3 lg:grid-cols-5">
+        {heritageTimeline.map((step, index) => (
+          <motion.div
+            animate={{
+              opacity: index <= liveStage % heritageTimeline.length ? 1 : 0.55,
+              y: index === liveStage % heritageTimeline.length ? -4 : 0,
+            }}
+            className="rounded-md border border-white/10 bg-white/[0.035] p-3"
+            key={step}
+            transition={{ duration: 0.3 }}
+          >
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
+              {index + 1}
+            </span>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">{step}</p>
+          </motion.div>
+        ))}
       </div>
     </div>
   )
@@ -390,12 +656,12 @@ function SectionIntro({ eyebrow, title, description }) {
   )
 }
 
-function ConversationSidebar({ liveStage }) {
+function ConversationSidebar({ activeDestination, liveStage }) {
   const conversations = [
-    ['Incidente en Barranco', 'Escalamiento de severidad media'],
-    ['Analisis visual Miraflores', 'Vista previa de imagen'],
-    ['Nota de voz Cusco', 'Transcripcion generada'],
-    ['Demanda Machu Picchu', 'Pico de flujo turistico'],
+    ['Ruta en Barranco', 'Alternativa mas accesible'],
+    ['Foto en Miraflores', 'Ingreso revisado por IA'],
+    ['Voz desde Cusco', 'Mensaje convertido en guia'],
+    ['Machu Picchu', 'Apoyo para flujo de visitantes'],
   ]
 
   return (
@@ -410,7 +676,8 @@ function ConversationSidebar({ liveStage }) {
             key={title}
             className={cn(
               'w-full rounded-md border p-3 text-left transition hover:-translate-y-0.5 hover:bg-white/[0.06]',
-              index === liveStage % conversations.length
+              title.toLowerCase().includes(activeDestination.toLowerCase()) ||
+                index === liveStage % conversations.length
                 ? 'border-primary/30 bg-primary/10'
                 : 'border-white/10 bg-white/[0.03]',
             )}
@@ -425,7 +692,148 @@ function ConversationSidebar({ liveStage }) {
   )
 }
 
-function ChatPanel({ liveStage }) {
+function ChatPanel({ liveStage, onDemoSignal }) {
+  const [messages, setMessages] = useState(chatMessages)
+  const [inputValue, setInputValue] = useState('')
+  const [isResponding, setIsResponding] = useState(false)
+  const [isListening, setIsListening] = useState(false)
+  const [speechStatus, setSpeechStatus] = useState('')
+  const messagesEndRef = useRef(null)
+  const recognitionRef = useRef(null)
+  const voiceTranscriptRef = useRef('')
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [messages, isResponding])
+
+  useEffect(() => {
+    return () => {
+      recognitionRef.current?.stop()
+    }
+  }, [])
+
+  async function handleSendMessage(message = inputValue, source = 'chat') {
+    const trimmedMessage = message.trim()
+
+    if (!trimmedMessage || isResponding) {
+      return
+    }
+
+    const detectedDestination = detectDestination(trimmedMessage)
+
+    const userMessage = {
+      from: 'user',
+      text: trimmedMessage,
+      time: getCurrentTime(),
+    }
+
+    setMessages((currentMessages) => [...currentMessages, userMessage])
+    setInputValue('')
+    setIsResponding(true)
+    setSpeechStatus(detectedDestination ? 'Analizando ruta...' : 'Procesando...')
+    onDemoSignal(trimmedMessage, source)
+
+    try {
+      const data = await sendChatMessage(
+        trimmedMessage,
+        buildChatHistory(messages),
+      )
+
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          from: 'ai',
+          text: data.response,
+          time: getCurrentTime(),
+          meta: detectedDestination
+            ? `Mapa actualizado: ${detectedDestination}`
+            : 'Rimay AI esta analizando tu experiencia',
+        },
+      ])
+    } catch {
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          from: 'ai',
+          text: 'Estoy reorganizando la mejor ruta accesible para ti. Intenta nuevamente en un momento y mantendre el contexto de tu experiencia.',
+          time: getCurrentTime(),
+          meta: 'Rimay AI mantiene la experiencia activa',
+        },
+      ])
+    } finally {
+      setIsResponding(false)
+    }
+  }
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      handleSendMessage()
+    }
+  }
+
+  function handleSuggestedPrompt(prompt) {
+    setInputValue(prompt)
+    handleSendMessage(prompt)
+  }
+
+  function handleVoiceInput() {
+    const SpeechRecognition =
+      window.SpeechRecognition ?? window.webkitSpeechRecognition
+
+    if (!SpeechRecognition) {
+      setSpeechStatus('Voz no disponible en este navegador')
+      return
+    }
+
+    if (isListening) {
+      recognitionRef.current?.stop()
+      setIsListening(false)
+      setSpeechStatus('')
+      return
+    }
+
+    const recognition = new SpeechRecognition()
+    recognition.lang = 'es-PE'
+    recognition.interimResults = true
+    recognition.continuous = false
+    voiceTranscriptRef.current = ''
+
+    recognition.onstart = () => {
+      setIsListening(true)
+      setSpeechStatus('Escuchando...')
+    }
+
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map((result) => result[0]?.transcript ?? '')
+        .join('')
+
+      setInputValue(transcript)
+      voiceTranscriptRef.current = transcript
+      setSpeechStatus('Transcripcion lista')
+    }
+
+    recognition.onerror = () => {
+      setIsListening(false)
+      setSpeechStatus('No se pudo capturar la voz')
+    }
+
+    recognition.onend = () => {
+      setIsListening(false)
+      const finalTranscript = voiceTranscriptRef.current.trim()
+
+      if (finalTranscript) {
+        setSpeechStatus('Procesando...')
+        handleSendMessage(finalTranscript, 'voz')
+        voiceTranscriptRef.current = ''
+      }
+    }
+
+    recognitionRef.current = recognition
+    recognition.start()
+  }
+
   return (
     <div className="glass-panel overflow-hidden rounded-lg">
       <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
@@ -435,46 +843,75 @@ function ChatPanel({ liveStage }) {
           </span>
           <div>
             <h3 className="font-semibold">Asistente Rimay</h3>
-            <p className="text-xs text-primary">triaje de accesibilidad online</p>
+            <p className="text-xs text-primary">guia inclusiva en linea</p>
           </div>
         </div>
-        <Button variant="outline" size="sm">
+        <Button
+          variant={isListening ? 'default' : 'outline'}
+          size="sm"
+          onClick={handleVoiceInput}
+          type="button"
+        >
           <Mic className="h-4 w-4" aria-hidden="true" />
-          Voz
+          {isListening ? 'Escuchando' : 'Voz'}
         </Button>
       </div>
 
-      <div className="max-h-[620px] space-y-4 overflow-hidden bg-[#071018]/80 p-5">
-        {chatMessages.map((message, index) => (
-          <ChatBubble key={message.text} index={index} {...message} />
+      <div className="max-h-[620px] space-y-4 overflow-y-auto bg-[#071018]/80 p-5">
+        {messages.map((message, index) => (
+          <ChatBubble key={`${message.text}-${index}`} index={index} {...message} />
         ))}
         <AudioMessage />
         <UploadPreview />
-        <TypingIndicator liveStage={liveStage} />
+        <CinematicAudioGuide />
+        {(isResponding || isListening) ? (
+          <TypingIndicator
+            liveStage={liveStage}
+            label={isListening ? 'Escuchando reporte de voz' : undefined}
+          />
+        ) : null}
+        <div ref={messagesEndRef} />
       </div>
 
       <div className="border-t border-white/10 bg-card/80 p-4">
         <div className="mb-3 flex flex-wrap gap-2">
           {suggestedPrompts.map((prompt) => (
-            <span
+            <button
               key={prompt}
-              className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-muted-foreground"
+              className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-left text-xs text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground disabled:opacity-50"
+              disabled={isResponding}
+              onClick={() => handleSuggestedPrompt(prompt)}
+              type="button"
             >
               {prompt}
-            </span>
+            </button>
           ))}
         </div>
-        <div className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.04] p-2">
-          <Button variant="ghost" size="icon">
+        {speechStatus ? (
+          <p className="mb-3 text-xs text-primary">{speechStatus}</p>
+        ) : null}
+        <form
+          className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.04] p-2"
+          onSubmit={(event) => {
+            event.preventDefault()
+            handleSendMessage()
+          }}
+        >
+          <Button variant="ghost" size="icon" type="button">
             <Paperclip className="h-5 w-5" aria-hidden="true" />
           </Button>
-          <div className="flex-1 text-sm text-muted-foreground">
-            Reporta un problema de accesibilidad turistica...
-          </div>
-          <Button size="icon">
+          <input
+            className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed"
+            disabled={isResponding}
+            onChange={(event) => setInputValue(event.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Cuenta que necesitas para viajar con menos barreras..."
+            value={inputValue}
+          />
+          <Button disabled={!inputValue.trim() || isResponding} size="icon" type="submit">
             <Send className="h-4 w-4" aria-hidden="true" />
           </Button>
-        </div>
+        </form>
       </div>
     </div>
   )
@@ -545,7 +982,7 @@ function UploadPreview() {
           <div>
             <p className="text-sm font-medium">ingreso-barranco.jpg</p>
             <p className="text-xs text-muted-foreground">
-              Resultado simulado: sardinel alto, ruta alterna sugerida.
+              Resultado simulado: ingreso dificil, alternativa mas amable sugerida.
             </p>
           </div>
         </div>
@@ -554,13 +991,48 @@ function UploadPreview() {
   )
 }
 
-function TypingIndicator({ liveStage }) {
+function CinematicAudioGuide() {
+  return (
+    <div className="flex">
+      <div className="max-w-[86%] rounded-lg border border-primary/20 bg-primary/10 p-4 shadow-[0_0_36px_rgba(45,212,191,0.12)]">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold">Escuchar historia del lugar</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Narracion activa: Puente de los Suspiros
+            </p>
+          </div>
+          <Button
+            aria-label="Reproducir audioguia cinematografica simulada"
+            size="sm"
+            type="button"
+          >
+            <Play className="h-4 w-4" aria-hidden="true" />
+            2:18
+          </Button>
+        </div>
+        <div className="mt-4 flex items-end gap-1" aria-hidden="true">
+          {Array.from({ length: 28 }).map((_, index) => (
+            <motion.span
+              animate={{ height: [8, 24 + (index % 6) * 4, 10] }}
+              className="w-1 rounded-full bg-primary/80"
+              key={index}
+              transition={{ duration: 1.4, repeat: Infinity, delay: index * 0.035 }}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function TypingIndicator({ liveStage, label }) {
   const labels = [
-    'Clasificando severidad',
-    'Generando escalamiento municipal',
-    'Actualizando senal del panel',
-    'Preparando ruta accesible',
-    'Sincronizando punto critico del mapa',
+    'Entendiendo tu necesidad',
+    'Buscando una alternativa accesible',
+    'Actualizando la guia visual',
+    'Preparando una ruta mas amable',
+    'Conectando el reporte con el mapa',
   ]
 
   return (
@@ -576,19 +1048,22 @@ function TypingIndicator({ liveStage }) {
           />
         ))}
         <span className="ml-2 text-xs text-muted-foreground">
-          {labels[liveStage % labels.length]}
+          {label ?? labels[liveStage % labels.length]}
         </span>
       </div>
     </div>
   )
 }
 
-function KpiCard({ label, value, suffix, delta, icon: Icon }) {
+function KpiCard({ label, value, suffix, delta, icon: Icon, pulse = false }) {
   return (
     <motion.article
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
-      className="glass-panel rounded-lg p-5"
+      className={cn(
+        'glass-panel rounded-lg p-5',
+        pulse && 'ring-1 ring-primary/30 shadow-[0_0_40px_rgba(45,212,191,0.16)]',
+      )}
     >
       <div className="flex items-center justify-between">
         <span className="flex h-10 w-10 items-center justify-center rounded-md bg-white/[0.06] text-primary">
@@ -682,4 +1157,59 @@ function formatKpiValue(value, suffix) {
   }
 
   return String(value)
+}
+
+function detectDestination(message) {
+  const normalizedMessage = message
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  const match = destinationAliases.find((destination) =>
+    destination.aliases.some((alias) =>
+      normalizedMessage.includes(
+        alias
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase(),
+      ),
+    ),
+  )
+
+  return match?.key ?? null
+}
+
+function zoneMatchesDestination(zone, destination) {
+  if (!destination) {
+    return false
+  }
+
+  const normalizedZone = `${zone.name} ${zone.city}`
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+  const normalizedDestination = destination
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+
+  if (normalizedDestination === 'centro historico') {
+    return normalizedZone.includes('centro historico')
+  }
+
+  return normalizedZone.includes(normalizedDestination)
+}
+
+function buildChatHistory(messages) {
+  return messages.slice(-10).map((message) => ({
+    role: message.from === 'user' ? 'user' : 'assistant',
+    content: message.text,
+  }))
+}
+
+function getCurrentTime() {
+  return new Intl.DateTimeFormat('es-PE', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date())
 }

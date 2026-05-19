@@ -1,13 +1,21 @@
 from functools import lru_cache
-
-from google import genai
+import warnings
 
 from app.core.config import settings
 
 
 @lru_cache
-def get_gemini_client() -> genai.Client:
+def get_gemini_model():
     if not settings.gemini_api_key:
         raise RuntimeError('Gemini API key is not configured.')
 
-    return genai.Client(api_key=settings.gemini_api_key)
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore', FutureWarning)
+        import google.generativeai as genai
+
+    genai.configure(api_key=settings.gemini_api_key)
+
+    return genai.GenerativeModel(
+        model_name=settings.gemini_model,
+        system_instruction=settings.rimay_system_prompt,
+    )

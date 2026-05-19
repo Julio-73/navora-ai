@@ -1,53 +1,58 @@
 import {
+  Accessibility,
   Activity,
   AlertTriangle,
   Camera,
   CheckCircle2,
   Clock3,
+  Ear,
+  Eye,
+  Heart,
   Map,
   ShieldCheck,
   Upload,
+  UserRound,
   Users,
 } from 'lucide-react'
 
 export const tourismZones = [
   {
-    name: 'Costa Accesible de Miraflores',
+    name: 'Malecon accesible de Miraflores',
     city: 'Lima',
     score: 94,
-    status: 'Validada',
+    status: 'Lista para explorar',
     coordinates: [-12.1211, -77.0305],
     type: 'hotspot',
   },
   {
-    name: 'Corredor Barranco Puente',
+    name: 'Ruta amable en Barranco',
     city: 'Lima',
     score: 72,
-    status: 'Incidente detectado',
+    status: 'Barrera reportada',
     coordinates: [-12.149, -77.0219],
     type: 'incident',
   },
   {
-    name: 'Ruta Centro Historico',
+    name: 'Paseo accesible Centro Historico',
     city: 'Lima',
     score: 88,
-    status: 'Recomendada por IA',
+    status: 'Sugerida por IA',
     coordinates: [-12.0464, -77.0428],
     type: 'hotspot',
   },
   {
-    name: 'Acceso Plaza de Cusco',
+    name: 'Ingreso inclusivo Plaza de Cusco',
     city: 'Cusco',
     score: 81,
-    status: 'Requiere revision',
+    status: 'En revision',
     coordinates: [-13.5169, -71.9789],
     type: 'review',
   },
   {
-    name: 'Flujo de Ingreso Machu Picchu',
+    name: 'Acompanamiento Machu Picchu',
     city: 'Cusco',
     score: 76,
-    status: 'Alta demanda',
+    status: 'Alta asistencia',
     coordinates: [-13.1631, -72.545],
     type: 'hotspot',
   },
@@ -55,28 +60,28 @@ export const tourismZones = [
 
 export const baseKpis = [
   {
-    label: 'Rutas accesibles',
+    label: 'Rutas sin barreras',
     value: 2418,
     suffix: '',
     delta: '+18%',
     icon: Map,
   },
   {
-    label: 'Visitantes asistidos',
+    label: 'Personas orientadas',
     value: 8930,
     suffix: '',
     delta: '+31%',
     icon: Users,
   },
   {
-    label: 'Respuesta promedio',
+    label: 'Tiempo de ayuda',
     value: 1.2,
     suffix: 's',
     delta: '-24%',
     icon: Clock3,
   },
   {
-    label: 'Alertas resueltas',
+    label: 'Barreras atendidas',
     value: 96,
     suffix: '%',
     delta: '+12%',
@@ -104,36 +109,36 @@ export const routeQuality = [
 export const incidentQueue = [
   {
     icon: AlertTriangle,
-    title: 'Obstruccion de rampa en Barranco',
-    text: 'Reporte ciudadano: bloqueo temporal de vereda cerca del Puente de los Suspiros.',
+    title: 'Rampa bloqueada en Barranco',
+    text: 'Una persona reporto una vereda bloqueada cerca del Puente de los Suspiros.',
     zone: 'Barranco',
     severity: 'Media',
   },
   {
     icon: Camera,
-    title: 'Analisis de imagen completado',
-    text: 'La vista previa de IA detecto senalizacion tactil faltante cerca del malecon de Miraflores.',
+    title: 'Foto revisada por IA',
+    text: 'La imagen sugiere falta de senalizacion tactil cerca del malecon de Miraflores.',
     zone: 'Miraflores',
     severity: 'Baja',
   },
   {
     icon: CheckCircle2,
-    title: 'Ruta validada',
-    text: 'Ruta accesible del Centro Historico aprobada con cobertura de ascensor y rampas.',
+    title: 'Ruta lista para visitar',
+    text: 'El paseo del Centro Historico cuenta con ascensor cercano y rampas verificadas.',
     zone: 'Centro Historico',
     severity: 'Resuelto',
   },
   {
     icon: Upload,
-    title: 'Reporte turistico recibido',
-    text: 'Nota de audio desde la Plaza de Cusco convertida en borrador de revision de accesibilidad.',
+    title: 'Voz convertida en ayuda',
+    text: 'Una nota de audio desde la Plaza de Cusco se convirtio en una guia de accesibilidad.',
     zone: 'Cusco',
     severity: 'Revision',
   },
   {
     icon: Activity,
-    title: 'Pico de demanda en vivo',
-    text: 'El flujo de ingreso a Machu Picchu muestra un aumento de solicitudes de asistencia.',
+    title: 'Mas personas piden orientacion',
+    text: 'El ingreso a Machu Picchu muestra mas solicitudes de apoyo para moverse con seguridad.',
     zone: 'Machu Picchu',
     severity: 'Alta',
   },
@@ -142,19 +147,19 @@ export const incidentQueue = [
 export const chatMessages = [
   {
     from: 'ai',
-    text: 'Bienvenido a Rimay AI. Puedo priorizar reportes de accesibilidad desde texto, fotos y notas de voz en zonas turisticas del Peru.',
+    text: 'Hola, soy Rimay AI. Puedo ayudarte a encontrar rutas accesibles, entender barreras y reportar problemas usando texto, fotos o voz.',
     time: '09:41',
   },
   {
     from: 'user',
-    text: 'No hay acceso para silla de ruedas en esta zona turistica.',
+    text: 'No encuentro acceso para silla de ruedas en esta zona turistica.',
     time: '09:42',
   },
   {
     from: 'ai',
-    text: 'Incidente de accesibilidad detectado en Barranco. Severidad: Media. Se genero una sugerencia de escalamiento municipal.',
+    text: 'Gracias por avisar. Identifique una barrera de accesibilidad en Barranco. Puedo sugerir una ruta alterna y dejar el reporte listo para seguimiento.',
     time: '09:42',
-    meta: 'Vinculado a la cola de incidentes del panel',
+    meta: 'Conectado con la guia visual de accesibilidad',
   },
   {
     from: 'user',
@@ -163,14 +168,94 @@ export const chatMessages = [
   },
   {
     from: 'ai',
-    text: 'Vista previa de analisis de imagen: sardinel alto, rampa no visible y flujo peatonal estrecho. Accion recomendada: ruta asistida temporal por Bajada de Banos.',
+    text: 'Vista previa: el ingreso parece estrecho y el sardinel es alto. Te recomiendo una alternativa mas amable por Bajada de Banos.',
     time: '09:43',
-    meta: 'Resultado multimodal simulado',
+    meta: 'Ayuda visual simulada',
   },
 ]
 
 export const suggestedPrompts = [
-  'Reportar problema de acceso en Barranco',
-  'Buscar ruta de baja pendiente en Centro Historico',
-  'Analizar foto de ingreso subida',
+  'Muestrame el Puente de los Suspiros',
+  'Quiero una ruta accesible en Barranco',
+  'Buscar camino de baja pendiente en Centro Historico',
+  'Revisar una foto de ingreso',
+]
+
+export const culturalExperiences = [
+  {
+    place: 'Barranco',
+    title: 'Puente de los Suspiros',
+    description:
+      'Un paseo bohemio donde la musica, los balcones y la brisa del Pacifico hacen que cada paso se sienta como una historia compartida.',
+    emotion: 'Romantico, artistico y sereno',
+    accessibility: 'Ruta sugerida con pendientes suaves y puntos de descanso cercanos.',
+    ambience: 'Atardecer con guitarra criolla y luces calidas',
+    idealTime: '5:30 p.m.',
+  },
+  {
+    place: 'Miraflores',
+    title: 'Malecon y vista al mar',
+    description:
+      'Un borde verde sobre el oceano para respirar, mirar el horizonte y descubrir Lima desde un recorrido amplio y contemplativo.',
+    emotion: 'Libre, abierto y luminoso',
+    accessibility: 'Veredas amplias, cruces visibles y zonas de pausa accesibles.',
+    ambience: 'Brisa marina, jardines y sonido suave del mar',
+    idealTime: '9:00 a.m.',
+  },
+  {
+    place: 'Cusco',
+    title: 'Plaza y memoria andina',
+    description:
+      'Un lugar donde piedra, historia y comunidad se encuentran. Rimay acompana el recorrido con contexto claro y ritmo amable.',
+    emotion: 'Profundo, ancestral y vivo',
+    accessibility: 'Recomendado avanzar por tramos cortos y evitar calles de alta pendiente.',
+    ambience: 'Campanas, piedra antigua y energia de plaza',
+    idealTime: '8:30 a.m.',
+  },
+  {
+    place: 'Machu Picchu',
+    title: 'Santuario entre montanas',
+    description:
+      'Una experiencia de asombro: niebla, terrazas y montanas que invitan a sentir el patrimonio con respeto y calma.',
+    emotion: 'Majestuoso, silencioso e inolvidable',
+    accessibility: 'Planificar asistencia, descansos y rutas autorizadas de menor esfuerzo.',
+    ambience: 'Niebla ligera, viento andino y contemplacion',
+    idealTime: '6:30 a.m.',
+  },
+]
+
+export const explorationProfiles = [
+  {
+    label: 'Silla de ruedas',
+    icon: Accessibility,
+    recommendation: 'Prioriza rampas, pendientes suaves y descansos cercanos.',
+  },
+  {
+    label: 'Baja vision',
+    icon: Eye,
+    recommendation: 'Activa referencias claras, contraste alto y puntos tactiles.',
+  },
+  {
+    label: 'Adulto mayor',
+    icon: UserRound,
+    recommendation: 'Sugiere tramos cortos, sombra y bancas disponibles.',
+  },
+  {
+    label: 'Sensibilidad auditiva',
+    icon: Ear,
+    recommendation: 'Recomienda horarios tranquilos y zonas de menor ruido.',
+  },
+  {
+    label: 'Exploracion general',
+    icon: Heart,
+    recommendation: 'Equilibra historia, accesibilidad y ritmo de paseo.',
+  },
+]
+
+export const heritageTimeline = [
+  'Una turista cuenta una barrera por voz',
+  'Rimay entiende la necesidad y sugiere una alternativa',
+  'El mapa resalta una ruta mas amable',
+  'El panel muestra el impacto para otros visitantes',
+  'La experiencia cultural se vuelve mas accesible',
 ]

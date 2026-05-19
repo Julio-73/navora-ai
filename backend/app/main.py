@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -6,6 +8,11 @@ from app.core.config import settings
 
 
 def create_app() -> FastAPI:
+    logging.basicConfig(
+        format='%(asctime)s %(levelname)s [%(name)s] %(message)s',
+        level=logging.INFO,
+    )
+
     app = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
