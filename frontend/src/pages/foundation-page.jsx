@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import {
@@ -25,6 +25,8 @@ import {
   Radio,
   Send,
   Sparkles,
+  Volume2,
+  VolumeX,
   WifiOff,
 } from 'lucide-react'
 
@@ -58,11 +60,11 @@ const destinationAliases = [
 ]
 
 export function FoundationPage() {
-  const demo = useDemoRealtime()
+  const liveExperience = useDemoRealtime()
   const [activeDestination, setActiveDestination] = useState('Barranco')
   const [liveReport, setLiveReport] = useState(null)
 
-  function handleDemoSignal(message, source = 'chat') {
+  function handleExperienceSignal(message, source = 'chat') {
     const destination = detectDestination(message)
 
     if (!destination) {
@@ -82,19 +84,19 @@ export function FoundationPage() {
     <div className="bg-background">
       <HeroSection
         activeDestination={activeDestination}
-        liveStage={demo.liveStage}
-        tick={demo.tick}
+        liveStage={liveExperience.liveStage}
+        tick={liveExperience.tick}
       />
       <ChatSection
         activeDestination={activeDestination}
-        liveStage={demo.liveStage}
-        onDemoSignal={handleDemoSignal}
+        liveStage={liveExperience.liveStage}
+        onExperienceSignal={handleExperienceSignal}
       />
-      <AnalyticsSection kpis={demo.kpis} liveReport={liveReport} />
+      <AnalyticsSection kpis={liveExperience.kpis} liveReport={liveReport} />
       <OperationsSection
-        feed={demo.feed}
+        feed={liveExperience.feed}
         liveReport={liveReport}
-        liveStage={demo.liveStage}
+        liveStage={liveExperience.liveStage}
       />
     </div>
   )
@@ -107,6 +109,7 @@ function HeroSection({ activeDestination, liveStage, tick }) {
       className="premium-grid relative min-h-[calc(100vh-4rem)] overflow-hidden"
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_18%,rgba(45,212,191,0.22),transparent_30%),radial-gradient(circle_at_86%_72%,rgba(167,139,250,0.18),transparent_30%),linear-gradient(180deg,rgba(7,10,20,0),hsl(var(--background))_92%)]" />
+      <AmbientParticles />
 
       <div className="container relative grid min-h-[calc(100vh-4rem)] items-center gap-12 py-16 lg:grid-cols-[1.03fr_0.97fr]">
         <motion.div
@@ -132,17 +135,17 @@ function HeroSection({ activeDestination, liveStage, tick }) {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild>
               <a href="#ai-chat">
-                Probar asistente IA
+                Explorar Peru sin barreras
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </Button>
             <Button asChild variant="outline">
-              <a href="#platform">Explorar rutas accesibles</a>
+              <a href="#platform">Iniciar recorrido accesible</a>
             </Button>
           </div>
 
           <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
-            {[
+            {[ 
               ['Destinos inclusivos', '5 en exploracion'],
               ['Ayudas generadas', `${42 + tick} hoy`],
               ['Acompanamiento', 'Siempre activo'],
@@ -150,7 +153,7 @@ function HeroSection({ activeDestination, liveStage, tick }) {
               <motion.div
                 key={label}
                 whileHover={{ y: -3 }}
-                className="glass-panel rounded-lg px-4 py-3"
+                className="glass-panel premium-hover rounded-lg px-4 py-3"
               >
                 <p className="text-xs text-muted-foreground">{label}</p>
                 <p className="mt-1 text-sm font-semibold">{value}</p>
@@ -163,7 +166,7 @@ function HeroSection({ activeDestination, liveStage, tick }) {
           initial={{ opacity: 0, scale: 0.96, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ delay: 0.12, duration: 0.7, ease: 'easeOut' }}
-          className="glass-panel rounded-lg p-4"
+          className="glass-panel premium-hover rounded-lg p-4"
         >
           <div className="rounded-md border border-white/10 bg-[#090d16] p-4">
             <div className="flex items-center justify-between gap-4">
@@ -180,7 +183,7 @@ function HeroSection({ activeDestination, liveStage, tick }) {
             </div>
 
             <div className="mt-5 grid gap-3 lg:grid-cols-[1fr_0.76fr]">
-              <LeafletDemoMap
+              <LeafletExperienceMap
                 activeDestination={activeDestination}
                 liveStage={liveStage}
               />
@@ -205,7 +208,30 @@ function HeroSection({ activeDestination, liveStage, tick }) {
   )
 }
 
-function ChatSection({ activeDestination, liveStage, onDemoSignal }) {
+function AmbientParticles() {
+  const particles = [
+    ['12%', '24%', '0s'],
+    ['22%', '72%', '2.8s'],
+    ['42%', '18%', '5.6s'],
+    ['67%', '64%', '1.4s'],
+    ['82%', '28%', '4.2s'],
+    ['91%', '78%', '7s'],
+  ]
+
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+      {particles.map(([left, top, delay]) => (
+        <span
+          className="ambient-particle"
+          key={`${left}-${top}`}
+          style={{ animationDelay: delay, left, top }}
+        />
+      ))}
+    </div>
+  )
+}
+
+function ChatSection({ activeDestination, liveStage, onExperienceSignal }) {
   const [selectedProfile, setSelectedProfile] = useState(explorationProfiles[0])
 
   return (
@@ -227,7 +253,7 @@ function ChatSection({ activeDestination, liveStage, onDemoSignal }) {
             activeDestination={activeDestination}
             liveStage={liveStage}
           />
-          <ChatPanel liveStage={liveStage} onDemoSignal={onDemoSignal} />
+          <ChatPanel liveStage={liveStage} onExperienceSignal={onExperienceSignal} />
         </div>
       </div>
     </section>
@@ -260,7 +286,7 @@ function AnalyticsSection({ kpis, liveReport }) {
         ) : null}
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[0.62fr_0.38fr]">
-          <ChartPanel title="Necesidades de accesibilidad" subtitle="Senal semanal simulada por distrito">
+          <ChartPanel title="Necesidades de accesibilidad" subtitle="Senal inteligente por distrito">
             <ResponsiveContainer width="100%" height={280}>
               <AreaChart data={accessibilityTrend}>
                 <defs>
@@ -316,12 +342,12 @@ function OperationsSection({ feed, liveReport, liveStage }) {
         <SectionIntro
           eyebrow="Historias que ayudan"
           title="Una voz puede mejorar el camino de muchas personas."
-          description="La demo muestra como un reporte simple se convierte en orientacion util, una ruta alterna y una senal visible para mejorar la experiencia inclusiva."
+          description="Rimay muestra como un reporte simple se convierte en orientacion util, una ruta alterna y una senal visible para mejorar la experiencia inclusiva."
         />
 
         <div className="grid gap-6 md:grid-cols-2">
           <HeritageTimeline liveReport={liveReport} liveStage={liveStage} />
-          <div className="glass-panel rounded-lg p-5">
+          <div className="glass-panel premium-hover rounded-lg p-5">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold">Zonas que necesitan atencion</h3>
               <Badge className="text-primary">Aprendiendo</Badge>
@@ -358,7 +384,7 @@ function OperationsSection({ feed, liveReport, liveStage }) {
             </div>
           </div>
 
-          <div className="glass-panel rounded-lg p-5">
+          <div className="glass-panel premium-hover rounded-lg p-5">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold">Historias en tiempo real</h3>
               <span className="h-2 w-2 rounded-full bg-primary live-pulse" />
@@ -375,7 +401,7 @@ function OperationsSection({ feed, liveReport, liveStage }) {
   )
 }
 
-function LeafletDemoMap({ activeDestination, liveStage }) {
+function LeafletExperienceMap({ activeDestination, liveStage }) {
   const mapNodeRef = useRef(null)
   const mapRef = useRef(null)
   const markersRef = useRef([])
@@ -397,7 +423,7 @@ function LeafletDemoMap({ activeDestination, liveStage }) {
 
     markersRef.current = tourismZones.map((zone) => {
       const marker = L.marker(zone.coordinates, {
-        icon: createDemoIcon(zone, false),
+        icon: createMapMarkerIcon(zone, false),
       }).addTo(mapRef.current)
 
       marker.bindTooltip(
@@ -423,7 +449,7 @@ function LeafletDemoMap({ activeDestination, liveStage }) {
         index === liveStage % tourismZones.length
 
       marker.setIcon(
-        createDemoIcon(
+        createMapMarkerIcon(
           zone,
           isActive,
         ),
@@ -463,7 +489,7 @@ function CulturalMode({ selectedProfile, setSelectedProfile }) {
         initial={{ opacity: 0, y: 18 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-80px' }}
-        className="glass-panel rounded-lg p-5"
+        className="glass-panel premium-hover rounded-lg p-5"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -485,7 +511,7 @@ function CulturalMode({ selectedProfile, setSelectedProfile }) {
               <button
                 aria-pressed={isSelected}
                 className={cn(
-                  'rounded-md border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                  'premium-hover rounded-md border px-3 py-3 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
                   isSelected
                     ? 'border-primary/40 bg-primary/10 text-foreground'
                     : 'border-white/10 bg-white/[0.035] text-muted-foreground hover:bg-white/[0.07] hover:text-foreground',
@@ -525,7 +551,7 @@ function CulturalPlaceCard({ experience }) {
     <motion.article
       whileHover={{ y: -5 }}
       transition={{ duration: 0.22 }}
-      className="glass-panel rounded-lg p-5"
+      className="glass-panel premium-hover rounded-lg p-5"
     >
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -551,7 +577,7 @@ function CulturalPlaceCard({ experience }) {
 
 function InfoLine({ label, value }) {
   return (
-    <div className="rounded-md border border-white/10 bg-white/[0.035] p-3">
+    <div className="premium-hover rounded-md border border-white/10 bg-white/[0.035] p-3">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="mt-1 leading-6">{value}</p>
     </div>
@@ -586,7 +612,7 @@ function OfflineReadiness() {
 
 function HeritageTimeline({ liveReport, liveStage }) {
   return (
-    <div className="glass-panel rounded-lg p-5 md:col-span-2">
+    <div className="glass-panel premium-hover rounded-lg p-5 md:col-span-2">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h3 className="font-semibold">Camino de una experiencia mas inclusiva</h3>
@@ -606,7 +632,7 @@ function HeritageTimeline({ liveReport, liveStage }) {
               opacity: index <= liveStage % heritageTimeline.length ? 1 : 0.55,
               y: index === liveStage % heritageTimeline.length ? -4 : 0,
             }}
-            className="rounded-md border border-white/10 bg-white/[0.035] p-3"
+            className="premium-hover rounded-md border border-white/10 bg-white/[0.035] p-3"
             key={step}
             transition={{ duration: 0.3 }}
           >
@@ -621,7 +647,7 @@ function HeritageTimeline({ liveReport, liveStage }) {
   )
 }
 
-function createDemoIcon(zone, active) {
+function createMapMarkerIcon(zone, active) {
   const tone =
     zone.type === 'incident'
       ? 'incident'
@@ -631,7 +657,7 @@ function createDemoIcon(zone, active) {
 
   return L.divIcon({
     className: '',
-    html: `<div class="demo-marker ${tone} ${active ? 'active' : ''}"><span>${zone.score}</span></div>`,
+    html: `<div class="map-marker ${tone} ${active ? 'active' : ''}"><span>${zone.score}</span></div>`,
     iconSize: [44, 44],
     iconAnchor: [22, 22],
   })
@@ -692,11 +718,12 @@ function ConversationSidebar({ activeDestination, liveStage }) {
   )
 }
 
-function ChatPanel({ liveStage, onDemoSignal }) {
+function ChatPanel({ liveStage, onExperienceSignal }) {
   const [messages, setMessages] = useState(chatMessages)
   const [inputValue, setInputValue] = useState('')
   const [isResponding, setIsResponding] = useState(false)
   const [isListening, setIsListening] = useState(false)
+  const [isSoundEnabled, setIsSoundEnabled] = useState(true)
   const [speechStatus, setSpeechStatus] = useState('')
   const messagesEndRef = useRef(null)
   const recognitionRef = useRef(null)
@@ -731,13 +758,15 @@ function ChatPanel({ liveStage, onDemoSignal }) {
     setInputValue('')
     setIsResponding(true)
     setSpeechStatus(detectedDestination ? 'Analizando ruta...' : 'Procesando...')
-    onDemoSignal(trimmedMessage, source)
+    onExperienceSignal(trimmedMessage, source)
+    playSoftTone('send', isSoundEnabled)
 
     try {
       const data = await sendChatMessage(
         trimmedMessage,
         buildChatHistory(messages),
       )
+      playSoftTone('receive', isSoundEnabled)
 
       setMessages((currentMessages) => [
         ...currentMessages,
@@ -802,6 +831,7 @@ function ChatPanel({ liveStage, onDemoSignal }) {
     recognition.onstart = () => {
       setIsListening(true)
       setSpeechStatus('Escuchando...')
+      playSoftTone('voice', isSoundEnabled)
     }
 
     recognition.onresult = (event) => {
@@ -835,41 +865,74 @@ function ChatPanel({ liveStage, onDemoSignal }) {
   }
 
   return (
-    <div className="glass-panel overflow-hidden rounded-lg">
+    <motion.div
+      animate={{
+        boxShadow: isResponding
+          ? '0 0 0 1px rgba(45,212,191,0.18), 0 0 70px rgba(45,212,191,0.13)'
+          : '0 24px 80px rgba(0,0,0,0.22)',
+      }}
+      transition={{ duration: 0.28 }}
+      className="glass-panel premium-hover overflow-hidden rounded-lg"
+    >
       <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
         <div className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-md bg-primary text-primary-foreground">
+          <span className={cn(
+            'flex h-10 w-10 items-center justify-center rounded-md bg-primary text-primary-foreground',
+            isResponding && 'live-pulse',
+          )}>
             <Bot className="h-5 w-5" aria-hidden="true" />
           </span>
           <div>
             <h3 className="font-semibold">Asistente Rimay</h3>
-            <p className="text-xs text-primary">guia inclusiva en linea</p>
+            <p className="flex items-center gap-1.5 text-xs text-primary">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary live-pulse" />
+              IA activa
+            </p>
           </div>
         </div>
-        <Button
-          variant={isListening ? 'default' : 'outline'}
-          size="sm"
-          onClick={handleVoiceInput}
-          type="button"
-        >
-          <Mic className="h-4 w-4" aria-hidden="true" />
-          {isListening ? 'Escuchando' : 'Voz'}
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            aria-label={isSoundEnabled ? 'Desactivar sonidos sutiles' : 'Activar sonidos sutiles'}
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsSoundEnabled((current) => !current)}
+            type="button"
+          >
+            {isSoundEnabled ? (
+              <Volume2 className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <VolumeX className="h-4 w-4" aria-hidden="true" />
+            )}
+          </Button>
+          <Button
+            variant={isListening ? 'default' : 'outline'}
+            size="sm"
+            onClick={handleVoiceInput}
+            type="button"
+          >
+            <Mic className="h-4 w-4" aria-hidden="true" />
+            {isListening ? 'Escuchando' : 'Voz'}
+          </Button>
+        </div>
       </div>
 
       <div className="max-h-[620px] space-y-4 overflow-y-auto bg-[#071018]/80 p-5">
-        {messages.map((message, index) => (
-          <ChatBubble key={`${message.text}-${index}`} index={index} {...message} />
-        ))}
+        <AnimatePresence initial={false}>
+          {messages.map((message, index) => (
+            <ChatBubble key={`${message.text}-${index}`} index={index} {...message} />
+          ))}
+        </AnimatePresence>
         <AudioMessage />
         <UploadPreview />
         <CinematicAudioGuide />
-        {(isResponding || isListening) ? (
-          <TypingIndicator
-            liveStage={liveStage}
-            label={isListening ? 'Escuchando reporte de voz' : undefined}
-          />
-        ) : null}
+        <AnimatePresence>
+          {(isResponding || isListening) ? (
+            <TypingIndicator
+              liveStage={liveStage}
+              label={isListening ? 'Escuchando reporte de voz' : undefined}
+            />
+          ) : null}
+        </AnimatePresence>
         <div ref={messagesEndRef} />
       </div>
 
@@ -878,7 +941,7 @@ function ChatPanel({ liveStage, onDemoSignal }) {
           {suggestedPrompts.map((prompt) => (
             <button
               key={prompt}
-              className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-left text-xs text-muted-foreground transition hover:bg-white/[0.08] hover:text-foreground disabled:opacity-50"
+              className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-left text-xs text-muted-foreground transition hover:-translate-y-0.5 hover:border-primary/25 hover:bg-white/[0.08] hover:text-foreground disabled:opacity-50"
               disabled={isResponding}
               onClick={() => handleSuggestedPrompt(prompt)}
               type="button"
@@ -891,7 +954,7 @@ function ChatPanel({ liveStage, onDemoSignal }) {
           <p className="mb-3 text-xs text-primary">{speechStatus}</p>
         ) : null}
         <form
-          className="flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.04] p-2"
+          className="premium-focus flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.04] p-2"
           onSubmit={(event) => {
             event.preventDefault()
             handleSendMessage()
@@ -913,7 +976,7 @@ function ChatPanel({ liveStage, onDemoSignal }) {
           </Button>
         </form>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -922,10 +985,10 @@ function ChatBubble({ from, text, time, meta, index }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.04, duration: 0.28 }}
+      initial={{ opacity: 0, y: 14, scale: 0.985, filter: 'blur(4px)' }}
+      animate={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, y: 8, scale: 0.985 }}
+      transition={{ delay: Math.min(index * 0.025, 0.16), duration: 0.32, ease: 'easeOut' }}
       className={cn('flex', isUser && 'justify-end')}
     >
       <div
@@ -974,7 +1037,7 @@ function AudioMessage() {
 function UploadPreview() {
   return (
     <div className="flex">
-      <div className="max-w-[86%] rounded-lg border border-white/10 bg-white/[0.07] p-3">
+      <div className="premium-hover max-w-[86%] rounded-lg border border-white/10 bg-white/[0.07] p-3">
         <div className="flex items-center gap-3">
           <span className="flex h-12 w-12 items-center justify-center rounded-md bg-accent/20 text-accent">
             <Camera className="h-5 w-5" aria-hidden="true" />
@@ -982,7 +1045,7 @@ function UploadPreview() {
           <div>
             <p className="text-sm font-medium">ingreso-barranco.jpg</p>
             <p className="text-xs text-muted-foreground">
-              Resultado simulado: ingreso dificil, alternativa mas amable sugerida.
+              Analisis visual: ingreso dificil, alternativa mas amable sugerida.
             </p>
           </div>
         </div>
@@ -1003,7 +1066,7 @@ function CinematicAudioGuide() {
             </p>
           </div>
           <Button
-            aria-label="Reproducir audioguia cinematografica simulada"
+            aria-label="Reproducir audioguia cinematografica"
             size="sm"
             type="button"
           >
@@ -1036,23 +1099,72 @@ function TypingIndicator({ liveStage, label }) {
   ]
 
   return (
-    <div className="flex">
-      <div className="flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.07] px-4 py-3">
-        <AudioLines className="h-4 w-4 text-primary" aria-hidden="true" />
-        {[0, 1, 2].map((item) => (
-          <motion.span
-            key={item}
-            animate={{ opacity: [0.25, 1, 0.25], y: [0, -2, 0] }}
-            transition={{ duration: 1, repeat: Infinity, delay: item * 0.16 }}
-            className="h-2 w-2 rounded-full bg-primary"
-          />
-        ))}
-        <span className="ml-2 text-xs text-muted-foreground">
-          {label ?? labels[liveStage % labels.length]}
-        </span>
+    <motion.div
+      className="flex"
+      initial={{ opacity: 0, y: 12, filter: 'blur(5px)' }}
+      animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+      exit={{ opacity: 0, y: -6, filter: 'blur(4px)' }}
+      transition={{ duration: 0.28, ease: 'easeOut' }}
+    >
+      <div className="max-w-[86%] rounded-lg border border-primary/20 bg-white/[0.07] px-4 py-3 shadow-[0_0_44px_rgba(45,212,191,0.1)]">
+        <div className="flex items-center gap-2">
+          <AudioLines className="h-4 w-4 text-primary" aria-hidden="true" />
+          {[0, 1, 2].map((item) => (
+            <motion.span
+              key={item}
+              animate={{ opacity: [0.25, 1, 0.25], y: [0, -3, 0], scale: [1, 1.18, 1] }}
+              transition={{ duration: 1.08, repeat: Infinity, delay: item * 0.18 }}
+              className="h-2 w-2 rounded-full bg-primary"
+            />
+          ))}
+          <span className="ml-2 text-xs text-muted-foreground">
+            {label ?? labels[liveStage % labels.length]}
+          </span>
+        </div>
+        <div className="mt-3 grid gap-2" aria-hidden="true">
+          <span className="premium-shimmer h-2 w-56 max-w-full rounded-full" />
+          <span className="premium-shimmer h-2 w-36 rounded-full" />
+        </div>
       </div>
-    </div>
+    </motion.div>
   )
+}
+
+function playSoftTone(type, enabled) {
+  if (!enabled || typeof window === 'undefined') {
+    return
+  }
+
+  const AudioContext = window.AudioContext ?? window.webkitAudioContext
+
+  if (!AudioContext) {
+    return
+  }
+
+  try {
+    const context = new AudioContext()
+    const oscillator = context.createOscillator()
+    const gain = context.createGain()
+    const tones = {
+      send: [520, 0.045],
+      receive: [720, 0.06],
+      voice: [420, 0.07],
+    }
+    const [frequency, duration] = tones[type] ?? tones.receive
+
+    oscillator.frequency.value = frequency
+    oscillator.type = 'sine'
+    gain.gain.setValueAtTime(0.0001, context.currentTime)
+    gain.gain.exponentialRampToValueAtTime(0.035, context.currentTime + 0.012)
+    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + duration)
+    oscillator.connect(gain)
+    gain.connect(context.destination)
+    oscillator.start()
+    oscillator.stop(context.currentTime + duration)
+    oscillator.onended = () => context.close()
+  } catch {
+    // Sound feedback is decorative; never block the interaction.
+  }
 }
 
 function KpiCard({ label, value, suffix, delta, icon: Icon, pulse = false }) {
@@ -1061,7 +1173,7 @@ function KpiCard({ label, value, suffix, delta, icon: Icon, pulse = false }) {
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        'glass-panel rounded-lg p-5',
+        'glass-panel premium-hover rounded-lg p-5',
         pulse && 'ring-1 ring-primary/30 shadow-[0_0_40px_rgba(45,212,191,0.16)]',
       )}
     >
@@ -1086,7 +1198,7 @@ function KpiCard({ label, value, suffix, delta, icon: Icon, pulse = false }) {
 
 function ChartPanel({ title, subtitle, children }) {
   return (
-    <div className="glass-panel rounded-lg p-5">
+    <div className="glass-panel premium-hover rounded-lg p-5">
       <div className="mb-5 flex items-center justify-between">
         <div>
           <h3 className="font-semibold">{title}</h3>
@@ -1103,7 +1215,12 @@ function InsightCard({ title, value, icon: Icon, active }) {
   return (
     <motion.div
       animate={{ borderColor: active ? 'rgba(45,212,191,0.42)' : 'rgba(255,255,255,0.1)' }}
-      className="rounded-lg border bg-white/[0.045] p-4"
+      whileHover={{ y: -3, scale: 1.01 }}
+      transition={{ duration: 0.2 }}
+      className={cn(
+        'premium-hover rounded-lg border bg-white/[0.045] p-4',
+        active && 'shadow-[0_0_34px_rgba(45,212,191,0.12)]',
+      )}
     >
       <div className="flex items-center gap-3">
         <span className={cn('flex h-9 w-9 items-center justify-center rounded-md bg-white/[0.06]', active ? 'text-primary live-pulse' : 'text-muted-foreground')}>
@@ -1125,7 +1242,9 @@ function ActivityItem({ item }) {
     <motion.div
       initial={{ opacity: 0, x: 10 }}
       animate={{ opacity: 1, x: 0 }}
-      className="flex gap-3"
+      whileHover={{ x: 3 }}
+      transition={{ duration: 0.2 }}
+      className="premium-hover rounded-md border border-transparent p-2 -m-2 flex gap-3"
     >
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-white/[0.06] text-primary">
         <Icon className="h-4 w-4" aria-hidden="true" />

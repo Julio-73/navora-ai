@@ -170,7 +170,7 @@ export const chatMessages = [
     from: 'ai',
     text: 'Vista previa: el ingreso parece estrecho y el sardinel es alto. Te recomiendo una alternativa mas amable por Bajada de Banos.',
     time: '09:43',
-    meta: 'Ayuda visual simulada',
+    meta: 'Analisis visual de accesibilidad',
   },
 ]
 

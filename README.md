@@ -1,8 +1,8 @@
 # Rimay AI
 
-Rimay AI is a professional hackathon MVP foundation for an accessibility tourism platform with future multimodal AI, inclusive route intelligence, and real-time analytics.
+Rimay AI is a premium accessibility tourism platform for Peru, combining inclusive route intelligence, Gemini-powered assistance, cultural storytelling, voice interaction, maps, and real-time analytics.
 
-This repository is intentionally focused on foundation architecture only. It does not include AI logic, dashboard flows, chat, realtime subscriptions, or authentication yet.
+This repository is optimized for a stable product-grade MVP: clean architecture, fast local development, reliable AI chat, and a polished SaaS experience without unnecessary operational complexity.
 
 ## Architecture
 
@@ -34,7 +34,7 @@ Frontend:
 Backend:
 - FastAPI, Python, Pydantic, Uvicorn, dotenv
 - Supabase client prepared
-- Gemini SDK installed and isolated for future integration
+- Gemini SDK integrated behind a modular service boundary
 
 ## Environment
 
@@ -103,8 +103,8 @@ Logs are written to `frontend/dev.log`, `frontend/dev.err.log`, `backend/dev.log
 - Add future product areas as isolated feature modules.
 - Reuse `shared/ui` components before creating new visual primitives.
 - Keep integrations behind `services` or `integrations` boundaries.
-- Do not add auth, AI flows, realtime, chat, or dashboard logic until the MVP scope explicitly requires it.
-- Prioritize stable demo quality, clean naming, and fast iteration.
+- Keep product logic focused, modular, and easy to evolve.
+- Prioritize stable presentation quality, clean naming, and fast iteration.
 
 ## Current Foundation
 
@@ -116,4 +116,5 @@ Implemented:
 - FastAPI app factory with CORS and versioned API prefix
 - Pydantic settings from `.env`
 - Supabase and Gemini integration boundaries
+- Gemini-powered chat endpoint with contextual fallback
 - Professional setup documentation
