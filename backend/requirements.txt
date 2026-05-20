@@ -6,3 +6,5 @@ supabase
 python-dotenv
 google-genai
 google-generativeai
+python-multipart
+pillow

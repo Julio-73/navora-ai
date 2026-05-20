@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -16,8 +16,8 @@ import {
   ArrowRight,
   AudioLines,
   Bot,
-  Camera,
   Cloud,
+  ImageUp,
   Map,
   Mic,
   Paperclip,
@@ -41,7 +41,7 @@ import {
   tourismZones,
 } from '@/features/demo/demo-data'
 import { useDemoRealtime } from '@/features/demo/use-demo-realtime'
-import { sendChatMessage } from '@/services/api/chat-api'
+import { sendChatMessage, sendImageChatMessage } from '@/services/api/chat-api'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { cn } from '@/lib/utils'
@@ -719,10 +719,12 @@ function ConversationSidebar({ activeDestination, liveStage }) {
 }
 
 function ChatPanel({ liveStage, onExperienceSignal }) {
+  const imageInputId = useId()
   const [messages, setMessages] = useState(chatMessages)
   const [inputValue, setInputValue] = useState('')
   const [isResponding, setIsResponding] = useState(false)
   const [isListening, setIsListening] = useState(false)
+  const [uploadPreview, setUploadPreview] = useState(null)
   const [isSoundEnabled, setIsSoundEnabled] = useState(true)
   const [speechStatus, setSpeechStatus] = useState('')
   const messagesEndRef = useRef(null)
@@ -731,13 +733,16 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
-  }, [messages, isResponding])
+  }, [messages, isResponding, uploadPreview])
 
   useEffect(() => {
     return () => {
       recognitionRef.current?.stop()
+      if (uploadPreview?.url) {
+        URL.revokeObjectURL(uploadPreview.url)
+      }
     }
-  }, [])
+  }, [uploadPreview?.url])
 
   async function handleSendMessage(message = inputValue, source = 'chat') {
     const trimmedMessage = message.trim()
@@ -791,6 +796,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
       ])
     } finally {
       setIsResponding(false)
+      setSpeechStatus('')
     }
   }
 
@@ -807,18 +813,26 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
   }
 
   function handleVoiceInput() {
+    console.info('[Rimay AI] Voice button clicked')
+
+    if (isResponding && !isListening) {
+      setSpeechStatus('Espera un momento, Rimay esta terminando la respuesta actual.')
+      return
+    }
+
     const SpeechRecognition =
       window.SpeechRecognition ?? window.webkitSpeechRecognition
 
     if (!SpeechRecognition) {
-      setSpeechStatus('Voz no disponible en este navegador')
+      console.info('[Rimay AI] Web Speech API is not available in this browser')
+      setSpeechStatus('Voz no disponible en este navegador. Prueba con Chrome o Edge.')
       return
     }
 
     if (isListening) {
       recognitionRef.current?.stop()
       setIsListening(false)
-      setSpeechStatus('')
+      setSpeechStatus('Procesando voz...')
       return
     }
 
@@ -829,6 +843,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
     voiceTranscriptRef.current = ''
 
     recognition.onstart = () => {
+      console.info('[Rimay AI] Voice recognition started')
       setIsListening(true)
       setSpeechStatus('Escuchando...')
       playSoftTone('voice', isSoundEnabled)
@@ -844,24 +859,118 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
       setSpeechStatus('Transcripcion lista')
     }
 
-    recognition.onerror = () => {
+    recognition.onerror = (event) => {
+      console.info('[Rimay AI] Voice recognition error', event.error)
       setIsListening(false)
-      setSpeechStatus('No se pudo capturar la voz')
+      setSpeechStatus(
+        event.error === 'not-allowed'
+          ? 'Activa el permiso del microfono para usar voz.'
+          : 'No se pudo capturar la voz. Intenta hablar mas cerca del microfono.',
+      )
     }
 
     recognition.onend = () => {
+      console.info('[Rimay AI] Voice recognition ended')
       setIsListening(false)
       const finalTranscript = voiceTranscriptRef.current.trim()
 
       if (finalTranscript) {
-        setSpeechStatus('Procesando...')
+        setSpeechStatus('Enviando mensaje de voz...')
         handleSendMessage(finalTranscript, 'voz')
         voiceTranscriptRef.current = ''
       }
     }
 
     recognitionRef.current = recognition
-    recognition.start()
+
+    try {
+      recognition.start()
+    } catch (error) {
+      console.info('[Rimay AI] Voice recognition could not start', error)
+      setSpeechStatus('No se pudo iniciar la voz. Intenta nuevamente en unos segundos.')
+    }
+  }
+
+  async function handleImageUpload(event) {
+    console.info('[Rimay AI] Image input changed')
+    const file = event.target.files?.[0]
+
+    if (!file) {
+      console.info('[Rimay AI] Image picker closed without selection')
+      return
+    }
+
+    if (!file.type.startsWith('image/')) {
+      console.info('[Rimay AI] Invalid image type', file.type)
+      setSpeechStatus('Sube una imagen en formato JPG, PNG o WebP')
+      event.target.value = ''
+      return
+    }
+
+    if (file.size > 4 * 1024 * 1024) {
+      console.info('[Rimay AI] Image too large', file.size)
+      setSpeechStatus('La imagen debe pesar menos de 4 MB')
+      event.target.value = ''
+      return
+    }
+
+    const previewUrl = URL.createObjectURL(file)
+    console.info('[Rimay AI] Image selected', { name: file.name, size: file.size, type: file.type })
+    const optimizedFile = await optimizeImageForUpload(file)
+    const uploadMessage = inputValue.trim() || 'Analiza esta imagen desde accesibilidad turistica.'
+
+    setUploadPreview({
+      name: file.name,
+      status: 'Analizando imagen...',
+      url: previewUrl,
+    })
+    setInputValue('')
+    setIsResponding(true)
+    setSpeechStatus('Analizando imagen...')
+    playSoftTone('send', isSoundEnabled)
+
+    const userMessage = {
+      from: 'user',
+      text: `Subi una imagen para analizar accesibilidad: ${file.name}`,
+      time: getCurrentTime(),
+    }
+
+    setMessages((currentMessages) => [...currentMessages, userMessage])
+
+    try {
+      const data = await sendImageChatMessage({
+        file: optimizedFile,
+        message: uploadMessage,
+        history: buildChatHistory(messages),
+      })
+
+      playSoftTone('receive', isSoundEnabled)
+      setUploadPreview((current) => current ? { ...current, status: 'Analisis completado' } : current)
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          from: 'ai',
+          text: data.response,
+          time: getCurrentTime(),
+          meta: 'Imagen analizada con Gemini multimodal',
+        },
+      ])
+      onExperienceSignal(uploadMessage, 'imagen')
+    } catch {
+      setUploadPreview((current) => current ? { ...current, status: 'Reintenta con una imagen mas clara' } : current)
+      setMessages((currentMessages) => [
+        ...currentMessages,
+        {
+          from: 'ai',
+          text: 'Estoy teniendo dificultad para analizar la imagen ahora. Intenta subir una foto mas clara del ingreso, rampa, vereda u obstaculo, y mantendre el contexto de tu viaje.',
+          time: getCurrentTime(),
+          meta: 'Analisis visual en espera',
+        },
+      ])
+    } finally {
+      setIsResponding(false)
+      event.target.value = ''
+    }
   }
 
   return (
@@ -886,7 +995,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
             <h3 className="font-semibold">Asistente Rimay</h3>
             <p className="flex items-center gap-1.5 text-xs text-primary">
               <span className="h-1.5 w-1.5 rounded-full bg-primary live-pulse" />
-              IA activa
+              {speechStatus || 'IA activa'}
             </p>
           </div>
         </div>
@@ -905,6 +1014,8 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
             )}
           </Button>
           <Button
+            aria-label={isListening ? 'Detener escucha de voz' : 'Iniciar dictado por voz'}
+            disabled={isResponding && !isListening}
             variant={isListening ? 'default' : 'outline'}
             size="sm"
             onClick={handleVoiceInput}
@@ -923,7 +1034,11 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
           ))}
         </AnimatePresence>
         <AudioMessage />
-        <UploadPreview />
+        <UploadPreview
+          isProcessing={isResponding && uploadPreview?.status === 'Analizando imagen...'}
+          preview={uploadPreview}
+          onClear={() => setUploadPreview(null)}
+        />
         <CinematicAudioGuide />
         <AnimatePresence>
           {(isResponding || isListening) ? (
@@ -951,7 +1066,10 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
           ))}
         </div>
         {speechStatus ? (
-          <p className="mb-3 text-xs text-primary">{speechStatus}</p>
+          <div className="mb-3 flex flex-wrap items-center gap-3 text-xs text-primary">
+            <span>{speechStatus}</span>
+            {isListening ? <VoiceWaveform /> : null}
+          </div>
         ) : null}
         <form
           className="premium-focus flex items-center gap-3 rounded-lg border border-white/10 bg-white/[0.04] p-2"
@@ -960,10 +1078,36 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
             handleSendMessage()
           }}
         >
-          <Button variant="ghost" size="icon" type="button">
-            <Paperclip className="h-5 w-5" aria-hidden="true" />
-          </Button>
           <input
+            accept="image/png,image/jpeg,image/webp"
+            className="sr-only"
+            id={imageInputId}
+            onChange={handleImageUpload}
+            type="file"
+          />
+          <label
+            aria-disabled={isResponding}
+            aria-label="Subir imagen para analisis de accesibilidad"
+            className={cn(
+              'inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md px-3 text-sm font-medium transition-all duration-200 hover:bg-secondary hover:text-secondary-foreground active:scale-[0.98]',
+              isResponding && 'pointer-events-none opacity-50',
+            )}
+            htmlFor={imageInputId}
+            onClick={() => console.info('[Rimay AI] Image upload label clicked')}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault()
+                document.getElementById(imageInputId)?.click()
+              }
+            }}
+            role="button"
+            tabIndex={isResponding ? -1 : 0}
+          >
+            <Paperclip className="h-5 w-5" aria-hidden="true" />
+            <span className="hidden sm:inline">Subir imagen</span>
+          </label>
+          <input
+            aria-label="Mensaje para el asistente Rimay AI"
             className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed"
             disabled={isResponding}
             onChange={(event) => setInputValue(event.target.value)}
@@ -971,7 +1115,12 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
             placeholder="Cuenta que necesitas para viajar con menos barreras..."
             value={inputValue}
           />
-          <Button disabled={!inputValue.trim() || isResponding} size="icon" type="submit">
+          <Button
+            aria-label="Enviar mensaje al asistente"
+            disabled={!inputValue.trim() || isResponding}
+            size="icon"
+            type="submit"
+          >
             <Send className="h-4 w-4" aria-hidden="true" />
           </Button>
         </form>
@@ -1034,18 +1183,78 @@ function AudioMessage() {
   )
 }
 
-function UploadPreview() {
+function VoiceWaveform() {
+  return (
+    <span className="flex h-5 items-end gap-0.5" aria-hidden="true">
+      {Array.from({ length: 14 }).map((_, index) => (
+        <motion.span
+          animate={{ height: [5, 15 + (index % 4) * 2, 6] }}
+          className="w-0.5 rounded-full bg-primary/80"
+          key={index}
+          transition={{ duration: 0.82, repeat: Infinity, delay: index * 0.035 }}
+        />
+      ))}
+    </span>
+  )
+}
+
+function UploadPreview({ preview, isProcessing, onClear }) {
+  if (preview) {
+    return (
+      <motion.div
+        className="flex"
+        initial={{ opacity: 0, y: 12, filter: 'blur(4px)' }}
+        animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+        transition={{ duration: 0.28 }}
+      >
+        <div className="premium-hover max-w-[86%] overflow-hidden rounded-lg border border-primary/20 bg-white/[0.07] shadow-[0_0_44px_rgba(45,212,191,0.1)]">
+          <div className="relative h-40 w-72 max-w-full overflow-hidden bg-white/[0.04]">
+            <img
+              alt="Vista previa de imagen subida para analisis de accesibilidad"
+              className="h-full w-full object-cover"
+              src={preview.url}
+            />
+            {isProcessing ? (
+              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-background/90 to-transparent" />
+            ) : null}
+          </div>
+          <div className="p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium">{preview.name}</p>
+                <p className="mt-1 text-xs text-primary">{preview.status}</p>
+              </div>
+              <button
+                className="rounded-full border border-white/10 px-2 py-1 text-[11px] text-muted-foreground transition hover:border-primary/30 hover:text-foreground"
+                onClick={onClear}
+                type="button"
+              >
+                Ocultar
+              </button>
+            </div>
+            {isProcessing ? (
+              <div className="mt-3 grid gap-2" aria-hidden="true">
+                <span className="premium-shimmer h-2 w-full rounded-full" />
+                <span className="premium-shimmer h-2 w-2/3 rounded-full" />
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </motion.div>
+    )
+  }
+
   return (
     <div className="flex">
       <div className="premium-hover max-w-[86%] rounded-lg border border-white/10 bg-white/[0.07] p-3">
         <div className="flex items-center gap-3">
           <span className="flex h-12 w-12 items-center justify-center rounded-md bg-accent/20 text-accent">
-            <Camera className="h-5 w-5" aria-hidden="true" />
+            <ImageUp className="h-5 w-5" aria-hidden="true" />
           </span>
           <div>
-            <p className="text-sm font-medium">ingreso-barranco.jpg</p>
+            <p className="text-sm font-medium">Analisis visual listo</p>
             <p className="text-xs text-muted-foreground">
-              Analisis visual: ingreso dificil, alternativa mas amable sugerida.
+              Sube una foto del ingreso, rampa, vereda u obstaculo.
             </p>
           </div>
         </div>
@@ -1165,6 +1374,59 @@ function playSoftTone(type, enabled) {
   } catch {
     // Sound feedback is decorative; never block the interaction.
   }
+}
+
+function optimizeImageForUpload(file) {
+  if (!file.type.startsWith('image/') || file.type === 'image/gif') {
+    return Promise.resolve(file)
+  }
+
+  return new Promise((resolve) => {
+    const image = new Image()
+    const objectUrl = URL.createObjectURL(file)
+
+    image.onload = () => {
+      const maxSide = 1280
+      const scale = Math.min(1, maxSide / Math.max(image.width, image.height))
+      const canvas = document.createElement('canvas')
+      canvas.width = Math.round(image.width * scale)
+      canvas.height = Math.round(image.height * scale)
+
+      const context = canvas.getContext('2d')
+
+      if (!context) {
+        URL.revokeObjectURL(objectUrl)
+        resolve(file)
+        return
+      }
+
+      context.drawImage(image, 0, 0, canvas.width, canvas.height)
+      canvas.toBlob(
+        (blob) => {
+          URL.revokeObjectURL(objectUrl)
+
+          if (!blob) {
+            resolve(file)
+            return
+          }
+
+          resolve(new File([blob], file.name.replace(/\.[^.]+$/, '.jpg'), {
+            lastModified: Date.now(),
+            type: 'image/jpeg',
+          }))
+        },
+        'image/jpeg',
+        0.82,
+      )
+    }
+
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl)
+      resolve(file)
+    }
+
+    image.src = objectUrl
+  })
 }
 
 function KpiCard({ label, value, suffix, delta, icon: Icon, pulse = false }) {

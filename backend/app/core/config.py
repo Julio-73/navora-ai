@@ -22,6 +22,7 @@ class Settings(BaseSettings):
 
     gemini_api_key: str = ''
     gemini_model: str = 'gemini-2.5-flash'
+    gemini_fallback_model: str = 'gemini-2.0-flash'
     gemini_timeout_seconds: float = 5.5
     gemini_max_retries: int = 1
     gemini_retry_delay_seconds: float = 0.45

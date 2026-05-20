@@ -5,7 +5,7 @@ from app.core.config import settings
 
 
 @lru_cache
-def get_gemini_model():
+def get_gemini_model(model_name: str | None = None):
     if not settings.gemini_api_key:
         raise RuntimeError('Gemini API key is not configured.')
 
@@ -16,6 +16,6 @@ def get_gemini_model():
     genai.configure(api_key=settings.gemini_api_key)
 
     return genai.GenerativeModel(
-        model_name=settings.gemini_model,
+        model_name=model_name or settings.gemini_model,
         system_instruction=settings.rimay_system_prompt,
     )
