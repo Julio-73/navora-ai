@@ -1,11 +1,51 @@
-node_modules/
-dist/
-.venv/
-__pycache__/
-*.py[cod]
+# Environment variables and secrets
 .env
-.env.local
-.DS_Store
+*.env
+.env.*
+!.env.example
+!*.env.example
+backend/.env
+frontend/.env
+
+# Dependencies
+node_modules/
+frontend/node_modules/
+.venv/
+backend/.venv/
+
+# Build outputs
+dist/
+frontend/dist/
+build/
+frontend/build/
+dist-ssr/
+
+# Python caches
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*.pyo
 .pytest_cache/
+
+# Coverage and local caches
+coverage/
+.coverage
+.cache/
+.vite/
+
+# Logs and local runtime files
+logs/
+*.log
 dev.log
 dev.err.log
+backend/dev.log
+backend/dev.err.log
+frontend/dev.log
+frontend/dev.err.log
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
