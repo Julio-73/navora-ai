@@ -11,7 +11,7 @@ class Settings(BaseSettings):
         extra='ignore',
     )
 
-    app_name: str = 'Rimay AI API'
+    app_name: str = 'NAVORA AI API'
     app_version: str = '0.1.0'
     environment: str = 'development'
     api_v1_prefix: str = '/api/v1'
@@ -27,8 +27,8 @@ class Settings(BaseSettings):
     gemini_max_retries: int = 1
     gemini_retry_delay_seconds: float = 0.45
     gemini_max_output_tokens: int = 420
-    rimay_system_prompt: str = """
-Eres Rimay AI, un asistente inteligente de turismo inclusivo del Peru.
+    navora_system_prompt: str = """
+Eres NAVORA AI, un asistente inteligente de turismo inclusivo del Peru.
 Conversas con personas reales que desean explorar el patrimonio cultural del
 Peru sin barreras: personas con discapacidad, familias, adultos mayores,
 turistas con baja vision, movilidad reducida o sensibilidad auditiva.

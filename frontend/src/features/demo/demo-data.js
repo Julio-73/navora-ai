@@ -147,7 +147,7 @@ export const incidentQueue = [
 export const chatMessages = [
   {
     from: 'ai',
-    text: 'Hola, soy Rimay AI. Puedo ayudarte a encontrar rutas accesibles, entender barreras y reportar problemas usando texto, fotos o voz.',
+    text: 'Hola, soy NAVORA AI. Puedo ayudarte a encontrar rutas accesibles, entender barreras y reportar problemas usando texto, fotos o voz.',
     time: '09:41',
   },
   {
@@ -206,7 +206,7 @@ export const culturalExperiences = [
     place: 'Cusco',
     title: 'Plaza y memoria andina',
     description:
-      'Un lugar donde piedra, historia y comunidad se encuentran. Rimay acompana el recorrido con contexto claro y ritmo amable.',
+      'Un lugar donde piedra, historia y comunidad se encuentran. NAVORA acompana el recorrido con contexto claro y ritmo amable.',
     emotion: 'Profundo, ancestral y vivo',
     accessibility: 'Recomendado avanzar por tramos cortos y evitar calles de alta pendiente.',
     ambience: 'Campanas, piedra antigua y energia de plaza',
@@ -254,7 +254,7 @@ export const explorationProfiles = [
 
 export const heritageTimeline = [
   'Una turista cuenta una barrera por voz',
-  'Rimay entiende la necesidad y sugiere una alternativa',
+  'NAVORA entiende la necesidad y sugiere una alternativa',
   'El mapa resalta una ruta mas amable',
   'El panel muestra el impacto para otros visitantes',
   'La experiencia cultural se vuelve mas accesible',

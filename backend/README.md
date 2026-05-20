@@ -1,6 +1,6 @@
-# Rimay AI Backend
+# NAVORA AI Backend
 
-FastAPI foundation for Rimay AI.
+FastAPI backend for NAVORA AI, including text chat, multimodal image analysis, Gemini integration, fallback handling, and versioned API routes.
 
 ## Run Locally
 
@@ -14,7 +14,9 @@ uvicorn app.main:app --reload
 ## API
 
 ```txt
-GET /api/v1/health
+GET  /api/v1/health
+POST /api/v1/chat
+POST /api/v1/chat/image
 ```
 
 ## Structure
@@ -22,5 +24,5 @@ GET /api/v1/health
 - `api/v1`: versioned routers
 - `core`: settings and app configuration
 - `schemas`: Pydantic models
-- `services`: business logic boundaries
+- `services`: chat, multimodal and fallback logic
 - `integrations`: external providers such as Supabase and Gemini

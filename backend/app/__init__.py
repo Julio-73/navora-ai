@@ -1,1 +1,1 @@
-"""Rimay AI backend package."""
+"""NAVORA AI backend package."""

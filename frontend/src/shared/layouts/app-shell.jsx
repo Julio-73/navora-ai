@@ -36,7 +36,7 @@ export function AppShell() {
               <Accessibility className="h-5 w-5" aria-hidden="true" />
             </span>
             <span className="text-sm font-semibold tracking-wide">
-              Rimay AI
+              NAVORA AI
             </span>
           </a>
 

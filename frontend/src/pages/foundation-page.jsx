@@ -127,7 +127,7 @@ function HeroSection({ activeDestination, liveStage, tick }) {
             Tu companero inteligente para explorar el Peru sin barreras
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-            Rimay AI ayuda a personas con discapacidad, familias y viajeros a
+            NAVORA AI ayuda a personas con discapacidad, familias y viajeros a
             descubrir rutas accesibles, reportar barreras por voz o imagen y
             moverse por destinos del Peru con informacion clara, cercana y util.
           </p>
@@ -239,7 +239,7 @@ function ChatSection({ activeDestination, liveStage, onExperienceSignal }) {
       <div className="container">
         <SectionIntro
           eyebrow="Asistente IA de accesibilidad"
-          title="Pregunta como hablas. Rimay te acompana como una guia cercana."
+          title="Pregunta como hablas. NAVORA te acompana como una guia cercana."
           description="Usa texto, voz o imagen para contar una barrera, pedir una ruta accesible o entender que opcion es mas comoda para tu viaje."
         />
 
@@ -342,7 +342,7 @@ function OperationsSection({ feed, liveReport, liveStage }) {
         <SectionIntro
           eyebrow="Historias que ayudan"
           title="Una voz puede mejorar el camino de muchas personas."
-          description="Rimay muestra como un reporte simple se convierte en orientacion util, una ruta alterna y una senal visible para mejorar la experiencia inclusiva."
+          description="NAVORA muestra como un reporte simple se convierte en orientacion util, una ruta alterna y una senal visible para mejorar la experiencia inclusiva."
         />
 
         <div className="grid gap-6 md:grid-cols-2">
@@ -377,7 +377,7 @@ function OperationsSection({ feed, liveReport, liveStage }) {
             <div className="mt-5 rounded-md border border-white/10 bg-white/[0.035] p-4">
               <p className="text-sm font-medium">Historia de ayuda</p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                Una persona reporta una barrera en Barranco. Rimay sugiere una
+                Una persona reporta una barrera en Barranco. NAVORA sugiere una
                 ruta alterna, marca la zona y ayuda a que otros visitantes viajen
                 con mas tranquilidad.
               </p>
@@ -495,7 +495,7 @@ function CulturalMode({ selectedProfile, setSelectedProfile }) {
           <div>
             <h3 className="font-semibold">Como deseas explorar el Peru?</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              Rimay adapta el tono visual de la guia segun la forma en que
+              NAVORA adapta el tono visual de la guia segun la forma en que
               cada persona necesita moverse, escuchar o sentir el lugar.
             </p>
           </div>
@@ -781,7 +781,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
           time: getCurrentTime(),
           meta: detectedDestination
             ? `Mapa actualizado: ${detectedDestination}`
-            : 'Rimay AI esta analizando tu experiencia',
+            : 'NAVORA AI esta analizando tu experiencia',
         },
       ])
     } catch {
@@ -791,7 +791,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
           from: 'ai',
           text: 'Estoy reorganizando la mejor ruta accesible para ti. Intenta nuevamente en un momento y mantendre el contexto de tu experiencia.',
           time: getCurrentTime(),
-          meta: 'Rimay AI mantiene la experiencia activa',
+          meta: 'NAVORA AI mantiene la experiencia activa',
         },
       ])
     } finally {
@@ -813,10 +813,10 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
   }
 
   function handleVoiceInput() {
-    console.info('[Rimay AI] Voice button clicked')
+    console.info('[NAVORA AI] Voice button clicked')
 
     if (isResponding && !isListening) {
-      setSpeechStatus('Espera un momento, Rimay esta terminando la respuesta actual.')
+      setSpeechStatus('Espera un momento, NAVORA esta terminando la respuesta actual.')
       return
     }
 
@@ -824,7 +824,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
       window.SpeechRecognition ?? window.webkitSpeechRecognition
 
     if (!SpeechRecognition) {
-      console.info('[Rimay AI] Web Speech API is not available in this browser')
+      console.info('[NAVORA AI] Web Speech API is not available in this browser')
       setSpeechStatus('Voz no disponible en este navegador. Prueba con Chrome o Edge.')
       return
     }
@@ -843,7 +843,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
     voiceTranscriptRef.current = ''
 
     recognition.onstart = () => {
-      console.info('[Rimay AI] Voice recognition started')
+      console.info('[NAVORA AI] Voice recognition started')
       setIsListening(true)
       setSpeechStatus('Escuchando...')
       playSoftTone('voice', isSoundEnabled)
@@ -860,7 +860,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
     }
 
     recognition.onerror = (event) => {
-      console.info('[Rimay AI] Voice recognition error', event.error)
+      console.info('[NAVORA AI] Voice recognition error', event.error)
       setIsListening(false)
       setSpeechStatus(
         event.error === 'not-allowed'
@@ -870,7 +870,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
     }
 
     recognition.onend = () => {
-      console.info('[Rimay AI] Voice recognition ended')
+      console.info('[NAVORA AI] Voice recognition ended')
       setIsListening(false)
       const finalTranscript = voiceTranscriptRef.current.trim()
 
@@ -886,36 +886,36 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
     try {
       recognition.start()
     } catch (error) {
-      console.info('[Rimay AI] Voice recognition could not start', error)
+      console.info('[NAVORA AI] Voice recognition could not start', error)
       setSpeechStatus('No se pudo iniciar la voz. Intenta nuevamente en unos segundos.')
     }
   }
 
   async function handleImageUpload(event) {
-    console.info('[Rimay AI] Image input changed')
+    console.info('[NAVORA AI] Image input changed')
     const file = event.target.files?.[0]
 
     if (!file) {
-      console.info('[Rimay AI] Image picker closed without selection')
+      console.info('[NAVORA AI] Image picker closed without selection')
       return
     }
 
     if (!file.type.startsWith('image/')) {
-      console.info('[Rimay AI] Invalid image type', file.type)
+      console.info('[NAVORA AI] Invalid image type', file.type)
       setSpeechStatus('Sube una imagen en formato JPG, PNG o WebP')
       event.target.value = ''
       return
     }
 
     if (file.size > 4 * 1024 * 1024) {
-      console.info('[Rimay AI] Image too large', file.size)
+      console.info('[NAVORA AI] Image too large', file.size)
       setSpeechStatus('La imagen debe pesar menos de 4 MB')
       event.target.value = ''
       return
     }
 
     const previewUrl = URL.createObjectURL(file)
-    console.info('[Rimay AI] Image selected', { name: file.name, size: file.size, type: file.type })
+    console.info('[NAVORA AI] Image selected', { name: file.name, size: file.size, type: file.type })
     const optimizedFile = await optimizeImageForUpload(file)
     const uploadMessage = inputValue.trim() || 'Analiza esta imagen desde accesibilidad turistica.'
 
@@ -992,7 +992,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
             <Bot className="h-5 w-5" aria-hidden="true" />
           </span>
           <div>
-            <h3 className="font-semibold">Asistente Rimay</h3>
+            <h3 className="font-semibold">Asistente NAVORA</h3>
             <p className="flex items-center gap-1.5 text-xs text-primary">
               <span className="h-1.5 w-1.5 rounded-full bg-primary live-pulse" />
               {speechStatus || 'IA activa'}
@@ -1093,7 +1093,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
               isResponding && 'pointer-events-none opacity-50',
             )}
             htmlFor={imageInputId}
-            onClick={() => console.info('[Rimay AI] Image upload label clicked')}
+            onClick={() => console.info('[NAVORA AI] Image upload label clicked')}
             onKeyDown={(event) => {
               if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault()
@@ -1107,7 +1107,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
             <span className="hidden sm:inline">Subir imagen</span>
           </label>
           <input
-            aria-label="Mensaje para el asistente Rimay AI"
+            aria-label="Mensaje para el asistente NAVORA AI"
             className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed"
             disabled={isResponding}
             onChange={(event) => setInputValue(event.target.value)}

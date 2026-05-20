@@ -1,6 +1,6 @@
-# Rimay AI Frontend
+# NAVORA AI Frontend
 
-React/Vite foundation for the Rimay AI MVP.
+React + Vite frontend for the NAVORA AI premium accessibility tourism platform.
 
 ## Run Locally
 
@@ -14,9 +14,10 @@ npm run dev
 - `src/app`: router and app composition
 - `src/pages`: route-level screens
 - `src/shared`: reusable layout and UI primitives
-- `src/services`: API and external client boundaries
+- `src/services`: API boundaries
 - `src/config`: navigation and static configuration
+- `src/features`: experience data and reactive hooks
 
 ## Notes
 
-This is foundation architecture only. Do not add dashboard, chat, authentication, realtime, or AI product logic until those scopes are intentionally started.
+Keep the current premium UX, responsive behavior, Framer Motion interactions, chat, maps, and analytics stable while evolving the product.

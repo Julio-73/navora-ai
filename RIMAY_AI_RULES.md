@@ -1,11 +1,11 @@
-# RIMAY AI — PROJECT RULES
+# NAVORA AI - PROJECT RULES
 
 ## Objective
 Build a professional startup-style MVP for a hackathon.
 
 ## Core Principles
 - Clean architecture
-- Modular structure 
+- Modular structure
 - Reusable components
 - Avoid overengineering
 - Stable MVP first
@@ -66,7 +66,7 @@ Inspired by:
 - Easy future scalability
 
 ## MVP Priorities
-1. Stable demo
+1. Stable product experience
 2. Premium UI
 3. Realtime analytics
 4. Smooth UX
@@ -108,4 +108,3 @@ The product must feel like:
 - Modern SaaS platform
 - Premium technology product
 - Professional hackathon winner
-

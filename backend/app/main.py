@@ -16,7 +16,7 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.app_name,
         version=settings.app_version,
-        description='Foundation API for Rimay AI accessibility tourism platform.',
+        description='API for NAVORA AI accessibility tourism platform.',
     )
 
     app.add_middleware(

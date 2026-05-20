@@ -27,7 +27,7 @@ def generate_chat_response(
     safe_history = _compact_history(history or [])
 
     if not settings.gemini_api_key:
-        logger.info('Gemini API key not configured. Using Rimay fallback response.')
+        logger.info('Gemini API key not configured. Using NAVORA fallback response.')
         return ChatResponse(response=_fallback_response(normalized_message, safe_history))
 
     prompt = _build_prompt(normalized_message, safe_history)
@@ -87,7 +87,7 @@ def generate_chat_response(
             sleep(settings.gemini_retry_delay_seconds * attempt)
 
     logger.warning(
-        'Gemini unavailable after retries. Using Rimay fallback. reason=%s',
+        'Gemini unavailable after retries. Using NAVORA fallback. reason=%s',
         _classify_gemini_error(last_error),
     )
     return ChatResponse(response=_fallback_response(normalized_message, safe_history))
@@ -115,7 +115,7 @@ def generate_image_chat_response(
         )
 
     if not settings.gemini_api_key:
-        logger.info('Gemini API key not configured. Using Rimay image fallback response.')
+        logger.info('Gemini API key not configured. Using NAVORA image fallback response.')
         return ChatResponse(response=_fallback_image_response(normalized_message, safe_history))
 
     prompt = _build_image_prompt(normalized_message, safe_history, mime_type)
@@ -176,7 +176,7 @@ def generate_image_chat_response(
             sleep(settings.gemini_retry_delay_seconds * attempt)
 
     logger.warning(
-        'Gemini multimodal unavailable after retries. Using Rimay fallback. reason=%s',
+        'Gemini multimodal unavailable after retries. Using NAVORA fallback. reason=%s',
         _classify_gemini_error(last_error),
     )
     return ChatResponse(response=_fallback_image_response(normalized_message, safe_history))
@@ -314,7 +314,7 @@ def _summarize_error(exc: Exception, limit: int = 420) -> str:
 
 def _build_prompt(message: str, history: list[ChatHistoryMessage]) -> str:
     conversation = '\n'.join(
-        f"{'Usuario' if item.role == 'user' else 'Rimay AI'}: {item.content}"
+        f"{'Usuario' if item.role == 'user' else 'NAVORA AI'}: {item.content}"
         for item in history
     )
 
@@ -328,7 +328,7 @@ Contexto reciente de la conversacion:
 Nuevo mensaje del usuario:
 {message}
 
-Responde como Rimay AI, manteniendo memoria del destino, tipo de accesibilidad
+Responde como NAVORA AI, manteniendo memoria del destino, tipo de accesibilidad
 y necesidad humana mencionada en el historial. Si hay un destino turistico,
 incluye contexto cultural, experiencia sensorial y recomendacion accesible.
 """.strip()
@@ -336,7 +336,7 @@ incluye contexto cultural, experiencia sensorial y recomendacion accesible.
 
 def _build_image_prompt(message: str, history: list[ChatHistoryMessage], mime_type: str) -> str:
     conversation = '\n'.join(
-        f"{'Usuario' if item.role == 'user' else 'Rimay AI'}: {item.content}"
+        f"{'Usuario' if item.role == 'user' else 'NAVORA AI'}: {item.content}"
         for item in history
     )
 
@@ -353,7 +353,7 @@ Mensaje del usuario junto a la imagen:
 Tipo de archivo recibido:
 {mime_type}
 
-Analiza la imagen como Rimay AI, asistente de turismo inclusivo del Peru.
+Analiza la imagen como NAVORA AI, asistente de turismo inclusivo del Peru.
 Describe con claridad lo que puedas observar relacionado con accesibilidad:
 rampas, escaleras, sardinel, ancho de paso, senalizacion, contraste visual,
 iluminacion, obstaculos, flujo peatonal y posibles rutas mas amables.
