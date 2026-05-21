@@ -121,21 +121,21 @@ function HeroSection({ activeDestination, liveStage, tick }) {
         >
           <Badge className="text-primary">
             <span className="mr-2 h-2 w-2 rounded-full bg-primary live-pulse" />
-            Explora el Peru con mas confianza
+            Explora el Perú con más confianza
           </Badge>
           <h1 className="text-balance mt-6 max-w-4xl text-5xl font-semibold leading-[0.98] text-foreground sm:text-6xl lg:text-7xl">
-            Tu companero inteligente para explorar el Peru sin barreras
+            Tu compañero inteligente para explorar el Perú sin barreras
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
             NAVORA AI ayuda a personas con discapacidad, familias y viajeros a
             descubrir rutas accesibles, reportar barreras por voz o imagen y
-            moverse por destinos del Peru con informacion clara, cercana y util.
+            moverse por destinos del Perú con información clara, cercana y útil.
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button asChild>
               <a href="#ai-chat">
-                Explorar Peru sin barreras
+                Explorar Perú sin barreras
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </a>
             </Button>
@@ -146,7 +146,7 @@ function HeroSection({ activeDestination, liveStage, tick }) {
 
           <div className="mt-10 grid max-w-2xl grid-cols-3 gap-3">
             {[ 
-              ['Destinos inclusivos', '5 en exploracion'],
+              ['Destinos inclusivos', '5 en exploración'],
               ['Ayudas generadas', `${42 + tick} hoy`],
               ['Acompanamiento', 'Siempre activo'],
             ].map(([label, value]) => (
@@ -171,14 +171,14 @@ function HeroSection({ activeDestination, liveStage, tick }) {
           <div className="rounded-md border border-white/10 bg-[#090d16] p-4">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="text-sm font-medium">Rutas accesibles del Peru</p>
+                <p className="text-sm font-medium">Rutas accesibles del Perú</p>
                 <p className="text-xs text-muted-foreground">
-                  Lugares para explorar con mayor seguridad y autonomia
+                  Lugares para explorar con mayor seguridad y autonomía
                 </p>
               </div>
               <Badge className="border-primary/20 bg-primary/10 text-primary">
                 <Radio className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-                Guia activa
+                Guía activa
               </Badge>
             </div>
 
@@ -239,8 +239,8 @@ function ChatSection({ activeDestination, liveStage, onExperienceSignal }) {
       <div className="container">
         <SectionIntro
           eyebrow="Asistente IA de accesibilidad"
-          title="Pregunta como hablas. NAVORA te acompana como una guia cercana."
-          description="Usa texto, voz o imagen para contar una barrera, pedir una ruta accesible o entender que opcion es mas comoda para tu viaje."
+          title="Pregunta como hablas. NAVORA te acompaña como una guía cercana."
+          description="Usa texto, voz o imagen para contar una barrera, pedir una ruta accesible o entender qué opción es más cómoda para tu viaje."
         />
 
         <CulturalMode
@@ -266,8 +266,8 @@ function AnalyticsSection({ kpis, liveReport }) {
       <div className="container">
         <SectionIntro
           eyebrow="Accesibilidad en datos"
-          title="Informacion clara para mejorar la experiencia de cada visitante."
-          description="El panel muestra como los reportes de personas reales ayudan a priorizar rutas, detectar barreras y hacer mas inclusivos los destinos turisticos."
+          title="Información clara para mejorar la experiencia de cada visitante."
+          description="El panel muestra cómo los reportes de personas reales ayudan a priorizar rutas, detectar barreras y hacer más inclusivos los destinos turísticos."
         />
 
         <div className="mt-12 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -328,7 +328,7 @@ function OperationsSection({ feed, liveReport, liveStage }) {
         {
           icon: Mic,
           severity: 'Nuevo',
-          text: `Reporte por ${liveReport.source === 'voz' ? 'voz' : 'chat'} conectado con el mapa y la guia de ${liveReport.destination}.`,
+          text: `Reporte por ${liveReport.source === 'voz' ? 'voz' : 'chat'} conectado con el mapa y la guía de ${liveReport.destination}.`,
           title: `Nueva solicitud en ${liveReport.destination}`,
           zone: liveReport.destination,
         },
@@ -342,7 +342,7 @@ function OperationsSection({ feed, liveReport, liveStage }) {
         <SectionIntro
           eyebrow="Historias que ayudan"
           title="Una voz puede mejorar el camino de muchas personas."
-          description="NAVORA muestra como un reporte simple se convierte en orientacion util, una ruta alterna y una senal visible para mejorar la experiencia inclusiva."
+          description="NAVORA muestra cómo un reporte simple se convierte en orientación útil, una ruta alterna y una señal visible para mejorar la experiencia inclusiva."
         />
 
         <div className="grid gap-6 md:grid-cols-2">
@@ -379,7 +379,7 @@ function OperationsSection({ feed, liveReport, liveStage }) {
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
                 Una persona reporta una barrera en Barranco. NAVORA sugiere una
                 ruta alterna, marca la zona y ayuda a que otros visitantes viajen
-                con mas tranquilidad.
+                con más tranquilidad.
               </p>
             </div>
           </div>
@@ -467,7 +467,7 @@ function LeafletExperienceMap({ activeDestination, liveStage }) {
 
   return (
     <div
-      aria-label="Mapa interactivo con rutas accesibles y lugares inclusivos del Peru"
+      aria-label="Mapa interactivo con rutas accesibles y lugares inclusivos del Perú"
       className="relative min-h-[360px] overflow-hidden rounded-lg border border-white/10 bg-[#071018]"
       role="region"
     >
@@ -475,7 +475,7 @@ function LeafletExperienceMap({ activeDestination, liveStage }) {
       <div className="pointer-events-none absolute left-4 top-4 rounded-md border border-white/10 bg-background/75 px-3 py-2 backdrop-blur-xl">
         <p className="text-xs font-medium">Lugares inclusivos cercanos</p>
         <p className="text-[11px] text-muted-foreground">
-          Guia visual de accesibilidad
+          Guía visual de accesibilidad
         </p>
       </div>
     </div>
@@ -493,9 +493,9 @@ function CulturalMode({ selectedProfile, setSelectedProfile }) {
       >
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h3 className="font-semibold">Como deseas explorar el Peru?</h3>
+            <h3 className="font-semibold">¿Cómo deseas explorar el Perú?</h3>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">
-              NAVORA adapta el tono visual de la guia segun la forma en que
+              NAVORA adapta el tono visual de la guía según la forma en que
               cada persona necesita moverse, escuchar o sentir el lugar.
             </p>
           </div>
@@ -615,10 +615,10 @@ function HeritageTimeline({ liveReport, liveStage }) {
     <div className="glass-panel premium-hover rounded-lg p-5 md:col-span-2">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h3 className="font-semibold">Camino de una experiencia mas inclusiva</h3>
+          <h3 className="font-semibold">Camino de una experiencia más inclusiva</h3>
           <p className="mt-1 text-sm text-muted-foreground">
             Una historia conectada desde la voz de una persona hasta una ruta
-            mas amable para todos.
+            más amable para todos.
           </p>
         </div>
         <Badge className="text-primary">
@@ -684,9 +684,9 @@ function SectionIntro({ eyebrow, title, description }) {
 
 function ConversationSidebar({ activeDestination, liveStage }) {
   const conversations = [
-    ['Ruta en Barranco', 'Alternativa mas accesible'],
+    ['Ruta en Barranco', 'Alternativa más accesible'],
     ['Foto en Miraflores', 'Ingreso revisado por IA'],
-    ['Voz desde Cusco', 'Mensaje convertido en guia'],
+    ['Voz desde Cusco', 'Mensaje convertido en guía'],
     ['Machu Picchu', 'Apoyo para flujo de visitantes'],
   ]
 
@@ -789,7 +789,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
         ...currentMessages,
         {
           from: 'ai',
-          text: 'Estoy reorganizando la mejor ruta accesible para ti. Intenta nuevamente en un momento y mantendre el contexto de tu experiencia.',
+          text: 'Estoy reorganizando la mejor ruta accesible para ti. Intenta nuevamente en un momento y mantendré el contexto de tu experiencia.',
           time: getCurrentTime(),
           meta: 'NAVORA AI mantiene la experiencia activa',
         },
@@ -864,8 +864,8 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
       setIsListening(false)
       setSpeechStatus(
         event.error === 'not-allowed'
-          ? 'Activa el permiso del microfono para usar voz.'
-          : 'No se pudo capturar la voz. Intenta hablar mas cerca del microfono.',
+          ? 'Activa el permiso del micrófono para usar voz.'
+          : 'No se pudo capturar la voz. Intenta hablar más cerca del micrófono.',
       )
     }
 
@@ -917,7 +917,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
     const previewUrl = URL.createObjectURL(file)
     console.info('[NAVORA AI] Image selected', { name: file.name, size: file.size, type: file.type })
     const optimizedFile = await optimizeImageForUpload(file)
-    const uploadMessage = inputValue.trim() || 'Analiza esta imagen desde accesibilidad turistica.'
+    const uploadMessage = inputValue.trim() || 'Analiza esta imagen desde accesibilidad turística.'
 
     setUploadPreview({
       name: file.name,
@@ -931,7 +931,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
 
     const userMessage = {
       from: 'user',
-      text: `Subi una imagen para analizar accesibilidad: ${file.name}`,
+      text: `Subí una imagen para analizar accesibilidad: ${file.name}`,
       time: getCurrentTime(),
     }
 
@@ -945,7 +945,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
       })
 
       playSoftTone('receive', isSoundEnabled)
-      setUploadPreview((current) => current ? { ...current, status: 'Analisis completado' } : current)
+      setUploadPreview((current) => current ? { ...current, status: 'Análisis completado' } : current)
       setMessages((currentMessages) => [
         ...currentMessages,
         {
@@ -957,14 +957,14 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
       ])
       onExperienceSignal(uploadMessage, 'imagen')
     } catch {
-      setUploadPreview((current) => current ? { ...current, status: 'Reintenta con una imagen mas clara' } : current)
+      setUploadPreview((current) => current ? { ...current, status: 'Reintenta con una imagen más clara' } : current)
       setMessages((currentMessages) => [
         ...currentMessages,
         {
           from: 'ai',
-          text: 'Estoy teniendo dificultad para analizar la imagen ahora. Intenta subir una foto mas clara del ingreso, rampa, vereda u obstaculo, y mantendre el contexto de tu viaje.',
+          text: 'Estoy teniendo dificultad para analizar la imagen ahora. Intenta subir una foto más clara del ingreso, rampa, vereda u obstáculo, y mantendré el contexto de tu viaje.',
           time: getCurrentTime(),
-          meta: 'Analisis visual en espera',
+          meta: 'Análisis visual en espera',
         },
       ])
     } finally {
@@ -1087,7 +1087,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
           />
           <label
             aria-disabled={isResponding}
-            aria-label="Subir imagen para analisis de accesibilidad"
+            aria-label="Subir imagen para análisis de accesibilidad"
             className={cn(
               'inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md px-3 text-sm font-medium transition-all duration-200 hover:bg-secondary hover:text-secondary-foreground active:scale-[0.98]',
               isResponding && 'pointer-events-none opacity-50',
@@ -1210,7 +1210,7 @@ function UploadPreview({ preview, isProcessing, onClear }) {
         <div className="premium-hover max-w-[86%] overflow-hidden rounded-lg border border-primary/20 bg-white/[0.07] shadow-[0_0_44px_rgba(45,212,191,0.1)]">
           <div className="relative h-40 w-72 max-w-full overflow-hidden bg-white/[0.04]">
             <img
-              alt="Vista previa de imagen subida para analisis de accesibilidad"
+              alt="Vista previa de imagen subida para análisis de accesibilidad"
               className="h-full w-full object-cover"
               src={preview.url}
             />
@@ -1252,9 +1252,9 @@ function UploadPreview({ preview, isProcessing, onClear }) {
             <ImageUp className="h-5 w-5" aria-hidden="true" />
           </span>
           <div>
-            <p className="text-sm font-medium">Analisis visual listo</p>
+            <p className="text-sm font-medium">Análisis visual listo</p>
             <p className="text-xs text-muted-foreground">
-              Sube una foto del ingreso, rampa, vereda u obstaculo.
+              Sube una foto del ingreso, rampa, vereda u obstáculo.
             </p>
           </div>
         </div>
@@ -1302,8 +1302,8 @@ function TypingIndicator({ liveStage, label }) {
   const labels = [
     'Entendiendo tu necesidad',
     'Buscando una alternativa accesible',
-    'Actualizando la guia visual',
-    'Preparando una ruta mas amable',
+    'Actualizando la guía visual',
+    'Preparando una ruta más amable',
     'Conectando el reporte con el mapa',
   ]
 

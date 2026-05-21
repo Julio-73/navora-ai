@@ -17,7 +17,7 @@ import {
 
 export const tourismZones = [
   {
-    name: 'Malecon accesible de Miraflores',
+    name: 'Malecón accesible de Miraflores',
     city: 'Lima',
     score: 94,
     status: 'Lista para explorar',
@@ -33,7 +33,7 @@ export const tourismZones = [
     type: 'incident',
   },
   {
-    name: 'Paseo accesible Centro Historico',
+    name: 'Paseo accesible Centro Histórico',
     city: 'Lima',
     score: 88,
     status: 'Sugerida por IA',
@@ -44,7 +44,7 @@ export const tourismZones = [
     name: 'Ingreso inclusivo Plaza de Cusco',
     city: 'Cusco',
     score: 81,
-    status: 'En revision',
+    status: 'En revisión',
     coordinates: [-13.5169, -71.9789],
     type: 'review',
   },
@@ -82,7 +82,7 @@ export const baseKpis = [
   },
   {
     label: 'Barreras atendidas',
-    value: 96,
+    value: 104,
     suffix: '%',
     delta: '+12%',
     icon: ShieldCheck,
@@ -117,28 +117,28 @@ export const incidentQueue = [
   {
     icon: Camera,
     title: 'Foto revisada por IA',
-    text: 'La imagen sugiere falta de senalizacion tactil cerca del malecon de Miraflores.',
+    text: 'La imagen sugiere falta de señalización táctil cerca del malecón de Miraflores.',
     zone: 'Miraflores',
     severity: 'Baja',
   },
   {
     icon: CheckCircle2,
     title: 'Ruta lista para visitar',
-    text: 'El paseo del Centro Historico cuenta con ascensor cercano y rampas verificadas.',
-    zone: 'Centro Historico',
+    text: 'El paseo del Centro Histórico cuenta con ascensor cercano y rampas verificadas.',
+    zone: 'Centro Histórico',
     severity: 'Resuelto',
   },
   {
     icon: Upload,
     title: 'Voz convertida en ayuda',
-    text: 'Una nota de audio desde la Plaza de Cusco se convirtio en una guia de accesibilidad.',
+    text: 'Una nota de audio desde la Plaza de Cusco se convirtió en una guía de accesibilidad.',
     zone: 'Cusco',
-    severity: 'Revision',
+    severity: 'Revisión',
   },
   {
     icon: Activity,
-    title: 'Mas personas piden orientacion',
-    text: 'El ingreso a Machu Picchu muestra mas solicitudes de apoyo para moverse con seguridad.',
+    title: 'Más personas piden orientación',
+    text: 'El ingreso a Machu Picchu muestra más solicitudes de apoyo para moverse con seguridad.',
     zone: 'Machu Picchu',
     severity: 'Alta',
   },
@@ -152,32 +152,32 @@ export const chatMessages = [
   },
   {
     from: 'user',
-    text: 'No encuentro acceso para silla de ruedas en esta zona turistica.',
+    text: 'No encuentro acceso para silla de ruedas en esta zona turística.',
     time: '09:42',
   },
   {
     from: 'ai',
-    text: 'Gracias por avisar. Identifique una barrera de accesibilidad en Barranco. Puedo sugerir una ruta alterna y dejar el reporte listo para seguimiento.',
+    text: 'Gracias por avisar. Identifiqué una barrera de accesibilidad en Barranco. Puedo sugerir una ruta alterna y dejar el reporte listo para seguimiento.',
     time: '09:42',
-    meta: 'Conectado con la guia visual de accesibilidad',
+    meta: 'Conectado con la guía visual de accesibilidad',
   },
   {
     from: 'user',
-    text: 'Subi una foto del ingreso cerca del Puente de los Suspiros.',
+    text: 'Subí una foto del ingreso cerca del Puente de los Suspiros.',
     time: '09:43',
   },
   {
     from: 'ai',
-    text: 'Vista previa: el ingreso parece estrecho y el sardinel es alto. Te recomiendo una alternativa mas amable por Bajada de Banos.',
+    text: 'Vista previa: el ingreso parece estrecho y el sardinel es alto. Te recomiendo una alternativa más amable por Bajada de Baños.',
     time: '09:43',
-    meta: 'Analisis visual de accesibilidad',
+    meta: 'Análisis visual de accesibilidad',
   },
 ]
 
 export const suggestedPrompts = [
-  'Muestrame el Puente de los Suspiros',
+  'Muéstrame el Puente de los Suspiros',
   'Quiero una ruta accesible en Barranco',
-  'Buscar camino de baja pendiente en Centro Historico',
+  'Buscar camino de baja pendiente en Centro Histórico',
   'Revisar una foto de ingreso',
 ]
 
@@ -186,17 +186,17 @@ export const culturalExperiences = [
     place: 'Barranco',
     title: 'Puente de los Suspiros',
     description:
-      'Un paseo bohemio donde la musica, los balcones y la brisa del Pacifico hacen que cada paso se sienta como una historia compartida.',
-    emotion: 'Romantico, artistico y sereno',
+      'Un paseo bohemio donde la música, los balcones y la brisa del Pacífico hacen que cada paso se sienta como una historia compartida.',
+    emotion: 'Romántico, artístico y sereno',
     accessibility: 'Ruta sugerida con pendientes suaves y puntos de descanso cercanos.',
-    ambience: 'Atardecer con guitarra criolla y luces calidas',
+    ambience: 'Atardecer con guitarra criolla y luces cálidas',
     idealTime: '5:30 p.m.',
   },
   {
     place: 'Miraflores',
-    title: 'Malecon y vista al mar',
+    title: 'Malecón y vista al mar',
     description:
-      'Un borde verde sobre el oceano para respirar, mirar el horizonte y descubrir Lima desde un recorrido amplio y contemplativo.',
+      'Un borde verde sobre el océano para respirar, mirar el horizonte y descubrir Lima desde un recorrido amplio y contemplativo.',
     emotion: 'Libre, abierto y luminoso',
     accessibility: 'Veredas amplias, cruces visibles y zonas de pausa accesibles.',
     ambience: 'Brisa marina, jardines y sonido suave del mar',
@@ -206,20 +206,20 @@ export const culturalExperiences = [
     place: 'Cusco',
     title: 'Plaza y memoria andina',
     description:
-      'Un lugar donde piedra, historia y comunidad se encuentran. NAVORA acompana el recorrido con contexto claro y ritmo amable.',
+      'Un lugar donde piedra, historia y comunidad se encuentran. NAVORA acompaña el recorrido con contexto claro y ritmo amable.',
     emotion: 'Profundo, ancestral y vivo',
     accessibility: 'Recomendado avanzar por tramos cortos y evitar calles de alta pendiente.',
-    ambience: 'Campanas, piedra antigua y energia de plaza',
+    ambience: 'Campanas, piedra antigua y energía de plaza',
     idealTime: '8:30 a.m.',
   },
   {
     place: 'Machu Picchu',
-    title: 'Santuario entre montanas',
+    title: 'Santuario entre montañas',
     description:
-      'Una experiencia de asombro: niebla, terrazas y montanas que invitan a sentir el patrimonio con respeto y calma.',
+      'Una experiencia de asombro: niebla, terrazas y montañas que invitan a sentir el patrimonio con respeto y calma.',
     emotion: 'Majestuoso, silencioso e inolvidable',
     accessibility: 'Planificar asistencia, descansos y rutas autorizadas de menor esfuerzo.',
-    ambience: 'Niebla ligera, viento andino y contemplacion',
+    ambience: 'Niebla ligera, viento andino y contemplación',
     idealTime: '6:30 a.m.',
   },
 ]
@@ -231,9 +231,9 @@ export const explorationProfiles = [
     recommendation: 'Prioriza rampas, pendientes suaves y descansos cercanos.',
   },
   {
-    label: 'Baja vision',
+    label: 'Baja visión',
     icon: Eye,
-    recommendation: 'Activa referencias claras, contraste alto y puntos tactiles.',
+    recommendation: 'Activa referencias claras, contraste alto y puntos táctiles.',
   },
   {
     label: 'Adulto mayor',
@@ -246,7 +246,7 @@ export const explorationProfiles = [
     recommendation: 'Recomienda horarios tranquilos y zonas de menor ruido.',
   },
   {
-    label: 'Exploracion general',
+    label: 'Exploración general',
     icon: Heart,
     recommendation: 'Equilibra historia, accesibilidad y ritmo de paseo.',
   },
@@ -255,7 +255,7 @@ export const explorationProfiles = [
 export const heritageTimeline = [
   'Una turista cuenta una barrera por voz',
   'NAVORA entiende la necesidad y sugiere una alternativa',
-  'El mapa resalta una ruta mas amable',
+  'El mapa resalta una ruta más amable',
   'El panel muestra el impacto para otros visitantes',
-  'La experiencia cultural se vuelve mas accesible',
+  'La experiencia cultural se vuelve más accesible',
 ]
