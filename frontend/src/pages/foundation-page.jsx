@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, useState } from 'react'
+import { Fragment, useEffect, useId, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -253,7 +253,7 @@ function ChatSection({ activeDestination, liveStage, onExperienceSignal }) {
             activeDestination={activeDestination}
             liveStage={liveStage}
           />
-          <ChatPanel liveStage={liveStage} onExperienceSignal={onExperienceSignal} />
+          <ChatPanel liveStage={liveStage} onExperienceSignal={onExperienceSignal} selectedProfile={selectedProfile} />
         </div>
       </div>
     </section>
@@ -718,7 +718,7 @@ function ConversationSidebar({ activeDestination, liveStage }) {
   )
 }
 
-function ChatPanel({ liveStage, onExperienceSignal }) {
+function ChatPanel({ liveStage, onExperienceSignal, selectedProfile }) {
   const imageInputId = useId()
   const [messages, setMessages] = useState(chatMessages)
   const [inputValue, setInputValue] = useState('')
@@ -755,6 +755,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
 
     const userMessage = {
       from: 'user',
+      source,
       text: trimmedMessage,
       time: getCurrentTime(),
     }
@@ -776,6 +777,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
       setMessages((currentMessages) => [
         ...currentMessages,
         {
+          ...data,
           from: 'ai',
           text: data.response,
           time: getCurrentTime(),
@@ -949,6 +951,7 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
       setMessages((currentMessages) => [
         ...currentMessages,
         {
+          ...data,
           from: 'ai',
           text: data.response,
           time: getCurrentTime(),
@@ -1027,19 +1030,36 @@ function ChatPanel({ liveStage, onExperienceSignal }) {
         </div>
       </div>
 
-      <div className="max-h-[620px] space-y-4 overflow-y-auto bg-[#071018]/80 p-5">
+      <div className="max-h-[620px] space-y-3 overflow-y-auto bg-[#071018]/80 p-3 sm:space-y-4 sm:p-5">
         <AnimatePresence initial={false}>
-          {messages.map((message, index) => (
-            <ChatBubble key={`${message.text}-${index}`} index={index} {...message} />
-          ))}
+          {messages.map((message, index) => {
+            const isVisualAnalysis =
+              message.from === 'ai' &&
+              (message.tipo_barrera === 'Infraestructura / Física' ||
+                message.payload?.tipo_barrera === 'Infraestructura / Física')
+            const shouldShowAudioGuide =
+              message.from === 'ai' &&
+              (selectedProfile?.label === 'Baja visión' ||
+                selectedProfile?.label === 'Adulto mayor' ||
+                Boolean(message.audioUrl || message.payload?.audioUrl))
+
+            return (
+              <Fragment key={`${message.text}-${index}`}>
+                <ChatBubble index={index} {...message} />
+                {isVisualAnalysis && (
+                  <UploadPreview
+                    isProcessing={isResponding && uploadPreview?.status === 'Analizando imagen...'}
+                    preview={uploadPreview}
+                    onClear={() => setUploadPreview(null)}
+                  />
+                )}
+                {message.from === 'user' && message.source === 'voz' && <AudioMessage />}
+                {shouldShowAudioGuide && <CinematicAudioGuide />}
+              </Fragment>
+            )
+          })}
         </AnimatePresence>
-        <AudioMessage />
-        <UploadPreview
-          isProcessing={isResponding && uploadPreview?.status === 'Analizando imagen...'}
-          preview={uploadPreview}
-          onClear={() => setUploadPreview(null)}
-        />
-        <CinematicAudioGuide />
+
         <AnimatePresence>
           {(isResponding || isListening) ? (
             <TypingIndicator
@@ -1142,7 +1162,7 @@ function ChatBubble({ from, text, time, meta, index }) {
     >
       <div
         className={cn(
-          'max-w-[86%] rounded-lg px-4 py-3 text-sm leading-6 shadow-soft',
+          'max-w-[86%] rounded-lg px-3 py-2 text-sm leading-6 shadow-soft sm:px-4 sm:py-3',
           isUser
             ? 'bg-primary text-primary-foreground'
             : 'border border-white/10 bg-white/[0.07] text-foreground',
@@ -1165,7 +1185,7 @@ function ChatBubble({ from, text, time, meta, index }) {
 function AudioMessage() {
   return (
     <div className="flex justify-end">
-      <div className="flex max-w-[86%] items-center gap-3 rounded-lg bg-primary px-4 py-3 text-primary-foreground">
+      <div className="flex max-w-[86%] items-center gap-3 rounded-lg bg-primary px-3 py-2 text-primary-foreground sm:px-4 sm:py-3">
         <AudioLines className="h-5 w-5" aria-hidden="true" />
         <div className="flex items-end gap-1">
           {Array.from({ length: 18 }).map((_, index) => (
@@ -1266,7 +1286,7 @@ function UploadPreview({ preview, isProcessing, onClear }) {
 function CinematicAudioGuide() {
   return (
     <div className="flex">
-      <div className="max-w-[86%] rounded-lg border border-primary/20 bg-primary/10 p-4 shadow-[0_0_36px_rgba(45,212,191,0.12)]">
+      <div className="max-w-[86%] rounded-lg border border-primary/20 bg-primary/10 p-3 shadow-[0_0_36px_rgba(45,212,191,0.12)] sm:p-4">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="text-sm font-semibold">Escuchar historia del lugar</p>
