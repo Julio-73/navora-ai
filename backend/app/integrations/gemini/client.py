@@ -2,6 +2,7 @@ from functools import lru_cache
 import warnings
 
 from app.core.config import settings
+from app.services.ai.prompts import NAVORA_SYSTEM_PROMPT
 
 
 @lru_cache
@@ -17,5 +18,5 @@ def get_gemini_model(model_name: str | None = None):
 
     return genai.GenerativeModel(
         model_name=model_name or settings.gemini_model,
-        system_instruction=settings.navora_system_prompt,
+        system_instruction=NAVORA_SYSTEM_PROMPT,
     )

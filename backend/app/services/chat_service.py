@@ -1,12 +1,15 @@
 from concurrent.futures import TimeoutError
 from io import BytesIO
+import json
 import logging
 from queue import Empty, Queue
+import re
 from threading import Thread
 from time import perf_counter, sleep
 from typing import Any
 
 from PIL import Image, UnidentifiedImageError
+from pydantic import ValidationError
 
 from app.core.config import settings
 from app.integrations.gemini.client import get_gemini_model
@@ -17,6 +20,12 @@ logger = logging.getLogger(__name__)
 MAX_HISTORY_MESSAGES = 8
 MAX_HISTORY_ITEM_CHARS = 600
 MAX_IMAGE_SIDE = 1280
+BARRIER_TYPES = {
+    'Infraestructura / Física',
+    'Comunicacional / Sensorial',
+    'Ninguna / Guía Informativa',
+}
+SEVERITIES = {'Alta', 'Media', 'Baja', 'Ninguna'}
 
 
 def generate_chat_response(
@@ -27,12 +36,13 @@ def generate_chat_response(
     safe_history = _compact_history(history or [])
 
     if not settings.gemini_api_key:
-        logger.info('Gemini API key not configured. Using NAVORA fallback response.')
-        return ChatResponse(response=_fallback_response(normalized_message, safe_history))
+        logger.info('Gemini API key not configured. Using NAVORA structured fallback response.')
+        return _fallback_response(normalized_message, safe_history)
 
     prompt = _build_prompt(normalized_message, safe_history)
     total_attempts = max(settings.gemini_max_retries, 0) + 1
     candidate_models = _candidate_models()
+    last_error: Exception | None = None
 
     for attempt in range(1, total_attempts + 1):
         started_at = perf_counter()
@@ -52,13 +62,21 @@ def generate_chat_response(
             if not response_text:
                 raise ValueError('Gemini returned an empty response.')
 
+            structured_response = _parse_ai_response(
+                response_text=response_text,
+                message=normalized_message,
+                history=safe_history,
+                is_image=False,
+            )
             logger.info(
-                'Gemini response received. attempt=%s elapsed_ms=%s chars=%s',
+                'Gemini structured response received. attempt=%s elapsed_ms=%s chars=%s barrier=%s severity=%s',
                 attempt,
                 elapsed_ms,
                 len(response_text),
+                structured_response.tipo_barrera,
+                structured_response.gravedad,
             )
-            return ChatResponse(response=response_text.strip())
+            return structured_response
         except TimeoutError as exc:
             elapsed_ms = int((perf_counter() - started_at) * 1000)
             logger.warning(
@@ -87,10 +105,10 @@ def generate_chat_response(
             sleep(settings.gemini_retry_delay_seconds * attempt)
 
     logger.warning(
-        'Gemini unavailable after retries. Using NAVORA fallback. reason=%s',
+        'Gemini unavailable after retries. Using NAVORA structured fallback. reason=%s',
         _classify_gemini_error(last_error),
     )
-    return ChatResponse(response=_fallback_response(normalized_message, safe_history))
+    return _fallback_response(normalized_message, safe_history)
 
 
 def generate_image_chat_response(
@@ -100,27 +118,33 @@ def generate_image_chat_response(
     mime_type: str,
 ) -> ChatResponse:
     normalized_message = message.strip() or (
-        'Analiza esta imagen desde accesibilidad turistica y sugiere una ruta o accion amable.'
+        'Analiza esta imagen desde accesibilidad turística y sugiere una ruta o acción amable.'
     )
     safe_history = _compact_history(history or [])
 
     try:
         image = _prepare_image_for_gemini(image_bytes)
     except ValueError:
-        return ChatResponse(
-            response=(
+        return _build_response(
+            tipo_barrera='Ninguna / Guía Informativa',
+            gravedad='Ninguna',
+            emocion_usuario=_infer_emotion(normalized_message),
+            sitio_origen=_infer_context(normalized_message, safe_history) or 'Destino no identificado',
+            mensaje_asistente=(
                 'No pude leer la imagen con claridad. Intenta subir una foto en JPG o PNG, '
-                'idealmente bien iluminada y enfocada en el ingreso, vereda, rampa u obstaculo.'
-            )
+                'bien iluminada y enfocada en el ingreso, la vereda, una rampa o el obstáculo. '
+                'Así podré ayudarte con una lectura accesible más precisa y amable. 📷'
+            ),
         )
 
     if not settings.gemini_api_key:
-        logger.info('Gemini API key not configured. Using NAVORA image fallback response.')
-        return ChatResponse(response=_fallback_image_response(normalized_message, safe_history))
+        logger.info('Gemini API key not configured. Using NAVORA structured image fallback response.')
+        return _fallback_image_response(normalized_message, safe_history)
 
     prompt = _build_image_prompt(normalized_message, safe_history, mime_type)
     total_attempts = max(settings.gemini_max_retries, 0) + 1
     candidate_models = _candidate_models()
+    last_error: Exception | None = None
 
     for attempt in range(1, total_attempts + 1):
         started_at = perf_counter()
@@ -142,13 +166,21 @@ def generate_image_chat_response(
             if not response_text:
                 raise ValueError('Gemini returned an empty multimodal response.')
 
+            structured_response = _parse_ai_response(
+                response_text=response_text,
+                message=normalized_message,
+                history=safe_history,
+                is_image=True,
+            )
             logger.info(
-                'Gemini multimodal response received. attempt=%s elapsed_ms=%s chars=%s',
+                'Gemini multimodal structured response received. attempt=%s elapsed_ms=%s chars=%s barrier=%s severity=%s',
                 attempt,
                 elapsed_ms,
                 len(response_text),
+                structured_response.tipo_barrera,
+                structured_response.gravedad,
             )
-            return ChatResponse(response=response_text.strip())
+            return structured_response
         except TimeoutError as exc:
             elapsed_ms = int((perf_counter() - started_at) * 1000)
             logger.warning(
@@ -161,14 +193,15 @@ def generate_image_chat_response(
             last_error = exc
         except Exception as exc:
             elapsed_ms = int((perf_counter() - started_at) * 1000)
+            error_kind = _classify_gemini_error(exc)
             logger.warning(
                 'Gemini multimodal request failed. attempt=%s/%s elapsed_ms=%s kind=%s error=%s',
                 attempt,
                 total_attempts,
                 elapsed_ms,
-                _classify_gemini_error(exc),
+                error_kind,
                 _summarize_error(exc),
-                exc_info=_classify_gemini_error(exc) not in {'rate_limit', 'auth', 'model_not_found'},
+                exc_info=error_kind not in {'rate_limit', 'auth', 'model_not_found'},
             )
             last_error = exc
 
@@ -176,10 +209,10 @@ def generate_image_chat_response(
             sleep(settings.gemini_retry_delay_seconds * attempt)
 
     logger.warning(
-        'Gemini multimodal unavailable after retries. Using NAVORA fallback. reason=%s',
+        'Gemini multimodal unavailable after retries. Using NAVORA structured image fallback. reason=%s',
         _classify_gemini_error(last_error),
     )
-    return ChatResponse(response=_fallback_image_response(normalized_message, safe_history))
+    return _fallback_image_response(normalized_message, safe_history)
 
 
 def _generate_with_gemini(
@@ -229,8 +262,9 @@ def _call_gemini(
         content,
         generation_config={
             'max_output_tokens': settings.gemini_max_output_tokens,
-            'temperature': 0.72,
-            'top_p': 0.9,
+            'temperature': 0.78,
+            'top_p': 0.92,
+            'response_mime_type': 'application/json',
         },
         request_options={'timeout': settings.gemini_timeout_seconds},
     )
@@ -274,6 +308,112 @@ def _compact_history(history: list[ChatHistoryMessage]) -> list[ChatHistoryMessa
     return compacted
 
 
+def _parse_ai_response(
+    response_text: str,
+    message: str,
+    history: list[ChatHistoryMessage],
+    is_image: bool,
+) -> ChatResponse:
+    cleaned_text = _strip_json_fence(response_text)
+
+    try:
+        payload = json.loads(cleaned_text)
+    except json.JSONDecodeError:
+        logger.warning('Gemini returned non-JSON content. Wrapping as structured response.')
+        return _fallback_from_raw_text(response_text, message, history, is_image)
+
+    if not isinstance(payload, dict):
+        logger.warning('Gemini returned JSON that is not an object. Wrapping as structured response.')
+        return _fallback_from_raw_text(response_text, message, history, is_image)
+
+    normalized_payload = {
+        'tipo_barrera': _normalize_barrier_type(payload.get('tipo_barrera'), message, is_image),
+        'gravedad': _normalize_severity(payload.get('gravedad'), message, is_image),
+        'emocion_usuario': _clean_text(payload.get('emocion_usuario')) or _infer_emotion(message),
+        'sitio_origen': _clean_text(payload.get('sitio_origen')) or _infer_context(message, history) or 'Destino no identificado',
+        'mensaje_asistente': _clean_text(payload.get('mensaje_asistente') or payload.get('response')),
+    }
+
+    if not normalized_payload['mensaje_asistente']:
+        return _fallback_from_raw_text(response_text, message, history, is_image)
+
+    try:
+        return ChatResponse.model_validate(normalized_payload)
+    except ValidationError as exc:
+        logger.warning('Gemini JSON failed schema validation. error=%s', _summarize_error(exc))
+        normalized_payload['mensaje_asistente'] = normalized_payload['mensaje_asistente'][:5000]
+        normalized_payload['emocion_usuario'] = normalized_payload['emocion_usuario'][:220]
+        normalized_payload['sitio_origen'] = normalized_payload['sitio_origen'][:160]
+        return ChatResponse.model_validate(normalized_payload)
+
+
+def _strip_json_fence(text: str) -> str:
+    stripped = text.strip()
+    fenced_match = re.fullmatch(r'```(?:json)?\s*(.*?)\s*```', stripped, flags=re.DOTALL | re.IGNORECASE)
+
+    if fenced_match:
+        return fenced_match.group(1).strip()
+
+    object_match = re.search(r'\{.*\}', stripped, flags=re.DOTALL)
+    if object_match:
+        return object_match.group(0).strip()
+
+    return stripped
+
+
+def _fallback_from_raw_text(
+    response_text: str,
+    message: str,
+    history: list[ChatHistoryMessage],
+    is_image: bool,
+) -> ChatResponse:
+    raw_message = _clean_text(response_text)
+
+    if not raw_message:
+        return _fallback_image_response(message, history) if is_image else _fallback_response(message, history)
+
+    return _build_response(
+        tipo_barrera=_infer_barrier_type(message, is_image),
+        gravedad=_infer_severity(message, is_image),
+        emocion_usuario=_infer_emotion(message),
+        sitio_origen=_infer_context(message, history) or 'Destino no identificado',
+        mensaje_asistente=raw_message,
+    )
+
+
+def _normalize_barrier_type(value: Any, message: str, is_image: bool) -> str:
+    cleaned = _clean_text(value)
+
+    if cleaned in BARRIER_TYPES:
+        return cleaned
+
+    lowered = cleaned.lower()
+    if 'infra' in lowered or 'física' in lowered or 'fisica' in lowered:
+        return 'Infraestructura / Física'
+    if 'comunic' in lowered or 'sensorial' in lowered:
+        return 'Comunicacional / Sensorial'
+    if 'ninguna' in lowered or 'guía' in lowered or 'guia' in lowered:
+        return 'Ninguna / Guía Informativa'
+
+    return _infer_barrier_type(message, is_image)
+
+
+def _normalize_severity(value: Any, message: str, is_image: bool) -> str:
+    cleaned = _clean_text(value).capitalize()
+
+    if cleaned in SEVERITIES:
+        return cleaned
+
+    return _infer_severity(message, is_image)
+
+
+def _clean_text(value: Any) -> str:
+    if value is None:
+        return ''
+
+    return str(value).replace('\x00', '').strip()
+
+
 def _classify_gemini_error(exc: Exception | None) -> str:
     if exc is None:
         return 'unknown'
@@ -313,38 +453,29 @@ def _summarize_error(exc: Exception, limit: int = 420) -> str:
 
 
 def _build_prompt(message: str, history: list[ChatHistoryMessage]) -> str:
-    conversation = '\n'.join(
-        f"{'Usuario' if item.role == 'user' else 'NAVORA AI'}: {item.content}"
-        for item in history
-    )
-
-    if not conversation:
-        conversation = 'Sin historial previo.'
+    conversation = _format_conversation(history)
 
     return f"""
-Contexto reciente de la conversacion:
+Contexto reciente de la conversación:
 {conversation}
 
 Nuevo mensaje del usuario:
 {message}
 
-Responde como NAVORA AI, manteniendo memoria del destino, tipo de accesibilidad
-y necesidad humana mencionada en el historial. Si hay un destino turistico,
-incluye contexto cultural, experiencia sensorial y recomendacion accesible.
+Devuelve únicamente un objeto JSON válido con estas llaves exactas:
+tipo_barrera, gravedad, emocion_usuario, sitio_origen, mensaje_asistente.
+
+Prioriza una respuesta conversacional premium, cálida y útil dentro de mensaje_asistente.
+Si es una guía de viaje, no inventes barreras: usa tipo_barrera "Ninguna / Guía Informativa" y gravedad "Ninguna".
+Si detectas solicitud por voz, baja visión o audio, expande orientación espacial, referencias táctiles, iluminación y distancias.
 """.strip()
 
 
 def _build_image_prompt(message: str, history: list[ChatHistoryMessage], mime_type: str) -> str:
-    conversation = '\n'.join(
-        f"{'Usuario' if item.role == 'user' else 'NAVORA AI'}: {item.content}"
-        for item in history
-    )
-
-    if not conversation:
-        conversation = 'Sin historial previo.'
+    conversation = _format_conversation(history)
 
     return f"""
-Contexto reciente de la conversacion:
+Contexto reciente de la conversación:
 {conversation}
 
 Mensaje del usuario junto a la imagen:
@@ -353,100 +484,161 @@ Mensaje del usuario junto a la imagen:
 Tipo de archivo recibido:
 {mime_type}
 
-Analiza la imagen como NAVORA AI, asistente de turismo inclusivo del Peru.
-Describe con claridad lo que puedas observar relacionado con accesibilidad:
-rampas, escaleras, sardinel, ancho de paso, senalizacion, contraste visual,
-iluminacion, obstaculos, flujo peatonal y posibles rutas mas amables.
+Analiza la fotografía como visión artificial de accesibilidad turística.
+Observa sardineles, escalones, rampas, ancho de paso, relieve, iluminación,
+barandas, obstáculos, contraste visual, señalización y flujo peatonal.
 
-Mantente prudente: no inventes certezas si la imagen no permite confirmarlas.
-Entrega una respuesta humana, breve y accionable con:
-1. lectura visual accesible
-2. nivel de cuidado sugerido
-3. recomendacion concreta para una persona viajera
+Devuelve únicamente un objeto JSON válido con estas llaves exactas:
+tipo_barrera, gravedad, emocion_usuario, sitio_origen, mensaje_asistente.
+
+En mensaje_asistente explica qué se observa, por qué importa para una persona viajera
+y qué desvío o acción amable recomiendas de inmediato.
 """.strip()
 
 
-def _fallback_response(message: str, history: list[ChatHistoryMessage]) -> str:
+def _format_conversation(history: list[ChatHistoryMessage]) -> str:
+    conversation = '\n'.join(
+        f"{'Usuario' if item.role == 'user' else 'NAVORA AI'}: {item.content}"
+        for item in history
+    )
+
+    return conversation or 'Sin historial previo.'
+
+
+def _fallback_response(message: str, history: list[ChatHistoryMessage]) -> ChatResponse:
     lowered = message.lower()
     context = _infer_context(message, history)
 
-    if any(
-        word in lowered
-        for word in ['puente', 'suspiros', 'patrimonio', 'historia', 'muestrame', 'muéstrame', 'muestrame']
-    ):
-        return (
-            'El Puente de los Suspiros se siente como una pausa poetica de Barranco: '
-            'balcones, musica y una brisa suave que conecta historia y barrio. Para '
-            'vivirlo con menos barreras, te sugiero llegar por una ruta de pendiente '
-            'suave, avanzar con calma y elegir el atardecer, cuando el ambiente es '
-            'mas sereno y la experiencia se vuelve mas sensorial.'
+    if any(word in lowered for word in ['puente', 'suspiros', 'patrimonio', 'historia', 'muéstrame', 'muestrame']):
+        return _build_response(
+            tipo_barrera='Ninguna / Guía Informativa',
+            gravedad='Ninguna',
+            emocion_usuario=_infer_emotion(message),
+            sitio_origen=context or 'Barranco',
+            mensaje_asistente=(
+                'El Puente de los Suspiros se siente como una pausa poética de Barranco: '
+                'balcones, música y una brisa suave que conecta historia y barrio. 🌉 '
+                'Para vivirlo con menos barreras, te sugiero llegar por una ruta de pendiente suave, '
+                'avanzar con calma y elegir el atardecer, cuando el ambiente es más sereno y sensorial.'
+            ),
         )
 
-    if any(word in lowered for word in ['cafeteria', 'cafeterias', 'cafe', 'comer', 'descansar']):
+    if any(word in lowered for word in ['cafetería', 'cafeteria', 'café', 'cafe', 'comer', 'descansar']):
         place = context or 'la zona que mencionaste'
-        return (
-            f'Si seguimos hablando de {place}, buscaria una cafeteria tranquila, '
-            'con ingreso amplio, espacio para maniobrar y mesas accesibles. Tambien '
-            'conviene elegir horarios de menor afluencia para que la pausa sea mas '
-            'comoda, especialmente si vienes con silla de ruedas, baja vision o una '
-            'persona adulta mayor.'
+        return _build_response(
+            tipo_barrera='Ninguna / Guía Informativa',
+            gravedad='Ninguna',
+            emocion_usuario=_infer_emotion(message),
+            sitio_origen=place,
+            mensaje_asistente=(
+                f'Si seguimos hablando de {place}, buscaría una cafetería tranquila, con ingreso amplio, '
+                'espacio para maniobrar y mesas accesibles. ☕ También conviene elegir horarios de menor afluencia '
+                'para que la pausa sea más cómoda, especialmente si vienes con silla de ruedas, baja visión o una persona adulta mayor.'
+            ),
         )
 
-    if any(word in lowered for word in ['silla', 'rueda', 'rampa', 'wheelchair']):
-        place = f' en {context}' if context else ''
-        return (
-            f'Gracias por avisar. Identifique una posible barrera de accesibilidad{place}. '
-            'Te sugiero buscar una ruta alterna con rampas verificadas, menor pendiente '
-            'y puntos de descanso. Si puedes, guarda la ubicacion exacta y comparte el '
-            'reporte para que otras personas viajen con mas seguridad.'
-        )
-
-    if any(word in lowered for word in ['adulto mayor', 'persona adulta mayor', 'mayor', 'anciano']):
-        place = f' en {context}' if context else ''
-        return (
-            f'Para una persona adulta mayor{place}, conviene priorizar una ruta con '
-            'tramos cortos, bancas o puntos de descanso, cruces tranquilos y horarios '
-            'de menor afluencia. Si el destino tiene pendiente o veredas irregulares, '
-            'te sugiero avanzar por zonas mas iluminadas y guardar una alternativa '
-            'offline por si la senal baja durante el recorrido.'
-        )
-
-    if any(word in lowered for word in ['foto', 'imagen', 'entrada', 'ingreso']):
-        return (
-            'Puedo ayudarte a revisar la imagen con mirada accesible: altura del sardinel, '
-            'ancho de paso, senalizacion tactil, iluminacion y presencia de rampa. Si algo '
-            'no es comodo, lo mejor es sugerir un ingreso alterno mas amable.'
-        )
-
-    if any(word in lowered for word in ['cusco', 'machu', 'miraflores', 'barranco', 'centro historico', 'centro histórico']):
+    if any(word in lowered for word in ['cusco', 'machu', 'miraflores', 'barranco', 'centro histórico', 'centro historico']):
         place = context or _infer_place_from_text(lowered) or 'ese destino'
-        return (
-            f'{place} tiene una identidad cultural muy especial. Puedo ayudarte a vivirlo '
-            'con un ritmo mas tranquilo: elegir horarios de menor afluencia, ubicar rutas '
-            'con menos pendiente, reconocer puntos de descanso y convertir la visita en '
-            'una experiencia mas segura, sensible e inclusiva.'
+        return _build_response(
+            tipo_barrera='Ninguna / Guía Informativa',
+            gravedad='Ninguna',
+            emocion_usuario=_infer_emotion(message),
+            sitio_origen=place,
+            mensaje_asistente=(
+                f'{place} tiene una identidad cultural muy especial. ✨ Puedo ayudarte a vivirlo con un ritmo tranquilo: '
+                'elegir horarios de menor afluencia, ubicar rutas con menos pendiente, reconocer puntos de descanso '
+                'y convertir la visita en una experiencia más segura, sensible e inclusiva.'
+            ),
         )
 
-    place = f' en {context}' if context else ''
-
-    return (
-        f'Estoy reorganizando la mejor ruta accesible para ti{place}. Puedo ayudarte '
-        'a entender la barrera, recordar el destino del que venimos hablando, sugerir '
-        'una alternativa mas comoda y transformar tu reporte en una recomendacion clara '
-        'para explorar el Peru con menos obstaculos.'
+    return _build_response(
+        tipo_barrera=_infer_barrier_type(message, is_image=False),
+        gravedad=_infer_severity(message, is_image=False),
+        emocion_usuario=_infer_emotion(message),
+        sitio_origen=context or 'Destino no identificado',
+        mensaje_asistente=(
+            f'Estoy reorganizando la mejor ruta accesible para ti{f" en {context}" if context else ""}. '
+            'Puedo ayudarte a entender la barrera, recordar el destino del que venimos hablando, sugerir una alternativa más cómoda '
+            'y transformar tu reporte en una recomendación clara para explorar el Perú con menos obstáculos. 🧭'
+        ),
     )
 
 
-def _fallback_image_response(message: str, history: list[ChatHistoryMessage]) -> str:
+def _fallback_image_response(message: str, history: list[ChatHistoryMessage]) -> ChatResponse:
     context = _infer_context(message, history)
-    place = f' en {context}' if context else ''
 
-    return (
-        f'Estoy revisando la imagen con enfoque de accesibilidad{place}. Observa si hay '
-        'sardinel alto, escalones sin rampa, pasillos estrechos, senalizacion poco visible '
-        'u obstaculos en la vereda. Para viajar con mas calma, conviene buscar un ingreso '
-        'alterno amplio, buena iluminacion y una ruta con puntos de descanso cercanos.'
+    return _build_response(
+        tipo_barrera='Infraestructura / Física',
+        gravedad='Media',
+        emocion_usuario=_infer_emotion(message),
+        sitio_origen=context or 'Destino no identificado',
+        mensaje_asistente=(
+            f'Estoy revisando la imagen con enfoque de accesibilidad{f" en {context}" if context else ""}. 📷 '
+            'Observa si hay sardinel alto, escalones sin rampa, pasillos estrechos, señalización poco visible u obstáculos en la vereda. '
+            'Para viajar con más calma, conviene buscar un ingreso alterno amplio, buena iluminación y una ruta con puntos de descanso cercanos.'
+        ),
     )
+
+
+def _build_response(
+    tipo_barrera: str,
+    gravedad: str,
+    emocion_usuario: str,
+    sitio_origen: str,
+    mensaje_asistente: str,
+) -> ChatResponse:
+    return ChatResponse(
+        tipo_barrera=_normalize_barrier_type(tipo_barrera, mensaje_asistente, False),
+        gravedad=_normalize_severity(gravedad, mensaje_asistente, False),
+        emocion_usuario=emocion_usuario.strip() or 'Busca orientación clara y segura',
+        sitio_origen=sitio_origen.strip() or 'Destino no identificado',
+        mensaje_asistente=mensaje_asistente.strip(),
+    )
+
+
+def _infer_barrier_type(message: str, is_image: bool) -> str:
+    lowered = message.lower()
+
+    if is_image:
+        return 'Infraestructura / Física'
+
+    if any(word in lowered for word in ['rampa', 'sardinel', 'escalón', 'escalon', 'vereda', 'silla', 'ruedas', 'obstáculo', 'obstaculo']):
+        return 'Infraestructura / Física'
+
+    if any(word in lowered for word in ['baja visión', 'baja vision', 'audio', 'voz', 'señalización', 'senalizacion', 'ruido', 'auditiva']):
+        return 'Comunicacional / Sensorial'
+
+    return 'Ninguna / Guía Informativa'
+
+
+def _infer_severity(message: str, is_image: bool) -> str:
+    lowered = message.lower()
+
+    if any(word in lowered for word in ['peligro', 'bloqueado', 'bloqueada', 'no puedo pasar', 'imposible', 'caída', 'caida']):
+        return 'Alta'
+
+    if is_image or any(word in lowered for word in ['rampa', 'sardinel', 'escalón', 'escalon', 'silla', 'ruedas', 'obstáculo', 'obstaculo']):
+        return 'Media'
+
+    if any(word in lowered for word in ['señalización', 'senalizacion', 'contraste', 'ruido', 'iluminación', 'iluminacion']):
+        return 'Baja'
+
+    return 'Ninguna'
+
+
+def _infer_emotion(message: str) -> str:
+    lowered = message.lower()
+
+    if any(word in lowered for word in ['urgente', 'peligro', 'miedo', 'no puedo', 'ayuda']):
+        return 'Preocupación y necesidad de ayuda inmediata'
+
+    if any(word in lowered for word in ['confundido', 'confundida', 'perdido', 'perdida', 'cómo llego', 'como llego']):
+        return 'Incertidumbre y búsqueda de orientación clara'
+
+    if any(word in lowered for word in ['quiero', 'muéstrame', 'muestrame', 'explorar', 'visitar', 'guía', 'guia']):
+        return 'Curiosidad y deseo de explorar con confianza'
+
+    return 'Busca una experiencia más cómoda, segura e inclusiva'
 
 
 def _infer_context(message: str, history: list[ChatHistoryMessage]) -> str | None:
@@ -464,6 +656,6 @@ def _infer_place_from_text(text: str) -> str | None:
     if 'cusco' in text:
         return 'Cusco'
     if 'centro historico' in text or 'centro histórico' in text:
-        return 'Centro Historico'
+        return 'Centro Histórico'
 
     return None
