@@ -81,7 +81,7 @@ export function FoundationPage() {
   }
 
   return (
-    <div className="bg-background">
+    <div className="bg-[#070a13] bg-gradient-to-tr from-[#070a13] via-[#0b132b] to-[#070a13] pb-24 sm:pb-0">
       <HeroSection
         activeDestination={activeDestination}
         liveStage={liveExperience.liveStage}
@@ -133,7 +133,7 @@ function HeroSection({ activeDestination, liveStage, tick }) {
           </p>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button asChild>
+            <Button asChild className="shadow-[0_0_15px_rgba(0,180,216,0.25)] transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,180,216,0.45)]">
               <a href="#ai-chat">
                 Explorar Perú sin barreras
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -347,9 +347,9 @@ function OperationsSection({ feed, liveReport, liveStage }) {
 
         <div className="grid gap-6 md:grid-cols-2">
           <HeritageTimeline liveReport={liveReport} liveStage={liveStage} />
-          <div className="glass-panel premium-hover rounded-lg p-5">
+          <div className="premium-hover rounded-lg border border-white/[0.05] bg-[#111625]/60 p-5 shadow-soft backdrop-blur-md">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Zonas que necesitan atencion</h3>
+              <h3 className="font-semibold">Zonas que necesitan atención</h3>
               <Badge className="text-primary">Aprendiendo</Badge>
             </div>
             <div className="mt-5 grid grid-cols-6 gap-2">
@@ -384,7 +384,7 @@ function OperationsSection({ feed, liveReport, liveStage }) {
             </div>
           </div>
 
-          <div className="glass-panel premium-hover rounded-lg p-5">
+          <div className="premium-hover rounded-lg border border-white/[0.05] bg-[#111625]/60 p-5 shadow-soft backdrop-blur-md">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold">Historias en tiempo real</h3>
               <span className="h-2 w-2 rounded-full bg-primary live-pulse" />
@@ -489,7 +489,7 @@ function CulturalMode({ selectedProfile, setSelectedProfile }) {
         initial={{ opacity: 0, y: 18 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-80px' }}
-        className="glass-panel premium-hover rounded-lg p-5"
+        className="premium-hover rounded-lg border border-white/[0.05] bg-[#111625]/60 p-5 shadow-soft backdrop-blur-md"
       >
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -551,7 +551,7 @@ function CulturalPlaceCard({ experience }) {
     <motion.article
       whileHover={{ y: -5 }}
       transition={{ duration: 0.22 }}
-      className="glass-panel premium-hover rounded-lg p-5"
+      className="premium-hover rounded-lg border border-white/[0.05] bg-[#111625]/60 p-5 shadow-soft backdrop-blur-md"
     >
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -566,7 +566,7 @@ function CulturalPlaceCard({ experience }) {
         {experience.description}
       </p>
       <div className="mt-5 grid gap-3 text-sm">
-        <InfoLine label="Sensacion" value={experience.emotion} />
+        <InfoLine label="Sensación" value={experience.emotion} />
         <InfoLine label="Accesibilidad" value={experience.accessibility} />
         <InfoLine label="Ambiente" value={experience.ambience} />
         <InfoLine label="Horario ideal" value={experience.idealTime} />
@@ -577,7 +577,7 @@ function CulturalPlaceCard({ experience }) {
 
 function InfoLine({ label, value }) {
   return (
-    <div className="premium-hover rounded-md border border-white/10 bg-white/[0.035] p-3">
+    <div className="premium-hover rounded-md border border-white/[0.05] bg-[#111625]/60 p-3 backdrop-blur-md">
       <p className="text-xs text-muted-foreground">{label}</p>
       <p className="mt-1 leading-6">{value}</p>
     </div>
@@ -612,7 +612,7 @@ function OfflineReadiness() {
 
 function HeritageTimeline({ liveReport, liveStage }) {
   return (
-    <div className="glass-panel premium-hover rounded-lg p-5 md:col-span-2">
+    <div className="premium-hover rounded-lg border border-white/[0.05] bg-[#111625]/60 p-5 shadow-soft backdrop-blur-md md:col-span-2">
       <div className="flex items-center justify-between gap-4">
         <div>
           <h3 className="font-semibold">Camino de una experiencia más inclusiva</h3>
@@ -632,7 +632,7 @@ function HeritageTimeline({ liveReport, liveStage }) {
               opacity: index <= liveStage % heritageTimeline.length ? 1 : 0.55,
               y: index === liveStage % heritageTimeline.length ? -4 : 0,
             }}
-            className="premium-hover rounded-md border border-white/10 bg-white/[0.035] p-3"
+            className="premium-hover rounded-md border border-white/[0.05] bg-[#111625]/60 p-3 backdrop-blur-md"
             key={step}
             transition={{ duration: 0.3 }}
           >
@@ -691,7 +691,7 @@ function ConversationSidebar({ activeDestination, liveStage }) {
   ]
 
   return (
-    <div className="glass-panel rounded-lg p-4">
+    <div className="rounded-lg border border-white/[0.05] bg-[#111625]/60 p-4 shadow-soft backdrop-blur-md">
       <div className="flex items-center justify-between">
         <h3 className="font-semibold">Conversaciones</h3>
         <Badge>4 activas</Badge>
@@ -984,7 +984,7 @@ function ChatPanel({ liveStage, onExperienceSignal, selectedProfile }) {
           : '0 24px 80px rgba(0,0,0,0.22)',
       }}
       transition={{ duration: 0.28 }}
-      className="glass-panel premium-hover overflow-hidden rounded-lg"
+      className="premium-hover overflow-hidden rounded-lg border border-white/[0.05] bg-[#111625]/60 shadow-soft backdrop-blur-md"
     >
       <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
         <div className="flex items-center gap-3">
@@ -1165,7 +1165,7 @@ function ChatBubble({ from, text, time, meta, index }) {
           'max-w-[86%] rounded-lg px-3 py-2 text-sm leading-6 shadow-soft sm:px-4 sm:py-3',
           isUser
             ? 'bg-primary text-primary-foreground'
-            : 'border border-white/10 bg-white/[0.07] text-foreground',
+            : 'border border-white/[0.05] bg-[#111625]/60 text-foreground backdrop-blur-md',
         )}
       >
         <p>{text}</p>
@@ -1227,7 +1227,7 @@ function UploadPreview({ preview, isProcessing, onClear }) {
         animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
         transition={{ duration: 0.28 }}
       >
-        <div className="premium-hover max-w-[86%] overflow-hidden rounded-lg border border-primary/20 bg-white/[0.07] shadow-[0_0_44px_rgba(45,212,191,0.1)]">
+        <div className="premium-hover max-w-[86%] overflow-hidden rounded-lg border border-white/[0.05] bg-[#111625]/60 shadow-[0_0_44px_rgba(45,212,191,0.1)] backdrop-blur-md">
           <div className="relative h-40 w-72 max-w-full overflow-hidden bg-white/[0.04]">
             <img
               alt="Vista previa de imagen subida para análisis de accesibilidad"
@@ -1266,7 +1266,7 @@ function UploadPreview({ preview, isProcessing, onClear }) {
 
   return (
     <div className="flex">
-      <div className="premium-hover max-w-[86%] rounded-lg border border-white/10 bg-white/[0.07] p-3">
+      <div className="premium-hover max-w-[86%] rounded-lg border border-white/[0.05] bg-[#111625]/60 p-3 backdrop-blur-md">
         <div className="flex items-center gap-3">
           <span className="flex h-12 w-12 items-center justify-center rounded-md bg-accent/20 text-accent">
             <ImageUp className="h-5 w-5" aria-hidden="true" />
@@ -1335,7 +1335,7 @@ function TypingIndicator({ liveStage, label }) {
       exit={{ opacity: 0, y: -6, filter: 'blur(4px)' }}
       transition={{ duration: 0.28, ease: 'easeOut' }}
     >
-      <div className="max-w-[86%] rounded-lg border border-primary/20 bg-white/[0.07] px-4 py-3 shadow-[0_0_44px_rgba(45,212,191,0.1)]">
+      <div className="max-w-[86%] rounded-lg border border-white/[0.05] bg-[#111625]/60 px-4 py-3 shadow-[0_0_44px_rgba(45,212,191,0.1)] backdrop-blur-md">
         <div className="flex items-center gap-2">
           <AudioLines className="h-4 w-4 text-primary" aria-hidden="true" />
           {[0, 1, 2].map((item) => (
@@ -1455,7 +1455,7 @@ function KpiCard({ label, value, suffix, delta, icon: Icon, pulse = false }) {
       whileHover={{ y: -4 }}
       transition={{ duration: 0.2 }}
       className={cn(
-        'glass-panel premium-hover rounded-lg p-5',
+        'premium-hover rounded-lg border border-white/[0.05] bg-[#111625]/60 p-5 shadow-soft backdrop-blur-md',
         pulse && 'ring-1 ring-primary/30 shadow-[0_0_40px_rgba(45,212,191,0.16)]',
       )}
     >
@@ -1480,7 +1480,7 @@ function KpiCard({ label, value, suffix, delta, icon: Icon, pulse = false }) {
 
 function ChartPanel({ title, subtitle, children }) {
   return (
-    <div className="glass-panel premium-hover rounded-lg p-5">
+    <div className="premium-hover rounded-lg border border-white/[0.05] bg-[#111625]/60 p-5 shadow-soft backdrop-blur-md">
       <div className="mb-5 flex items-center justify-between">
         <div>
           <h3 className="font-semibold">{title}</h3>

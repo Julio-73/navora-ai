@@ -23,9 +23,11 @@ export function useDemoRealtime() {
       baseKpis.map((kpi, index) => ({
         ...kpi,
         value:
-          kpi.suffix === 's'
-            ? Math.max(0.9, kpi.value - (tick % 4) * 0.04)
-            : kpi.value + (tick % 8) * (index + 1),
+          kpi.label === 'Barreras atendidas'
+            ? 104
+            : kpi.suffix === 's'
+              ? Math.max(0.9, kpi.value - (tick % 4) * 0.04)
+              : kpi.value + (tick % 8) * (index + 1),
       })),
     [tick],
   )

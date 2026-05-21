@@ -2,7 +2,7 @@ import json
 import logging
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import Response
 
 from app.schemas.chat import ChatHistoryMessage, ChatRequest, ChatResponse
 from app.services.chat_service import generate_chat_response, generate_image_chat_response
@@ -15,7 +15,7 @@ ALLOWED_IMAGE_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
 
 
 @router.post('/chat', response_model=ChatResponse)
-def chat(request: ChatRequest) -> JSONResponse:
+def chat(request: ChatRequest) -> Response:
     try:
         response = generate_chat_response(request.message, request.history)
         return _utf8_json_response(response)
@@ -29,7 +29,7 @@ async def chat_image(
     image: UploadFile = File(...),
     message: str = Form(''),
     history: str = Form('[]'),
-) -> JSONResponse:
+) -> Response:
     if image.content_type not in ALLOWED_IMAGE_TYPES:
         raise HTTPException(
             status_code=400,
@@ -77,8 +77,8 @@ def _parse_history(raw_history: str) -> list[ChatHistoryMessage]:
         raise HTTPException(status_code=400, detail='Historial inválido.') from exc
 
 
-def _utf8_json_response(response: ChatResponse) -> JSONResponse:
-    return JSONResponse(
-        content=response.model_dump(mode='json'),
+def _utf8_json_response(response: ChatResponse) -> Response:
+    return Response(
+        content=json.dumps(response.model_dump(mode='json'), ensure_ascii=False).encode('utf-8'),
         media_type='application/json; charset=utf-8',
     )
