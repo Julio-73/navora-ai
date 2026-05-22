@@ -29,7 +29,7 @@ export function AppShell() {
 
   return (
     <div className="min-h-screen overflow-hidden bg-background">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-background/72 backdrop-blur-2xl max-md:sticky max-md:top-0 max-md:z-50 max-md:border-b max-md:border-white/[0.05] max-md:bg-[#070a13]/80 max-md:backdrop-blur-md">
+      <header className="fixed top-0 left-0 z-50 w-full border-b border-white/[0.05] bg-[#070a13]/75 backdrop-blur-md">
         <div className="container flex h-16 items-center justify-between">
           <a href="/" className="flex items-center gap-3">
             <span className="flex h-9 w-9 items-center justify-center rounded-md bg-primary text-primary-foreground shadow-[0_0_36px_rgba(45,212,191,0.32)]">
@@ -101,7 +101,7 @@ export function AppShell() {
         </AnimatePresence>
       </header>
 
-      <main className="max-md:pt-0">
+      <main>
         <Outlet />
       </main>
     </div>

@@ -81,7 +81,7 @@ export function FoundationPage() {
   }
 
   return (
-    <div className="bg-[#070a13] bg-gradient-to-tr from-[#070a13] via-[#0b132b] to-[#070a13] pb-24 sm:pb-0">
+    <div className="bg-[#070a13] bg-gradient-to-tr from-[#070a13] via-[#0b132b] to-[#070a13] pb-24 pt-16 sm:pb-0">
       <HeroSection
         activeDestination={activeDestination}
         liveStage={liveExperience.liveStage}
