@@ -248,3 +248,6 @@ MIT License.
 AI Full Stack Developer
 
 Construido con enfoque en IA aplicada, accesibilidad, turismo inclusivo y experiencias SaaS premium.
+
+Demo:
+https://github.com/Julio-73/navora-ai
